@@ -1,10 +1,10 @@
 {
   "name": "neon-world",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
   "description": "Experiência urbana 3D em primeira pessoa no navegador",
   "scripts": {
-    "build": "esbuild src/app.js --bundle --minify --legal-comments=none --outfile=game.js",
+    "build": "esbuild src/app.js --bundle --minify --legal-comments=none --outfile=game.js && node scripts/clean-build.mjs",
     "dev": "python3 -m http.server 8080"
   },
   "dependencies": {

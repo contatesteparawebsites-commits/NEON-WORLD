@@ -1,10 +1,10 @@
 # NEON WORLD
 
-Experiência urbana 3D em primeira pessoa para navegador, inteiramente em português do Brasil. O jogador dirige pela cidade de Nova Aurora a partir do cockpit, pode abandonar o veículo e explorar as ruas a pé, além de usar um player multimídia interativo integrado ao painel do carro.
+Experiência urbana 3D em primeira pessoa para navegador, com renderização naturalista, iluminação cinematográfica e interface em português do Brasil. A direção visual usa técnicas comuns a jogos urbanos realistas, sem utilizar marcas, modelos, texturas ou outros recursos de jogos comerciais.
 
 ## Executar
 
-O build final está incluído no repositório. Inicie um servidor local:
+O build final está incluído no repositório:
 
 ```bash
 python3 -m http.server 8080
@@ -12,7 +12,7 @@ python3 -m http.server 8080
 
 Abra `http://localhost:8080` em Chrome, Edge ou Firefox.
 
-O Service Worker salva `index.html` e `game.js` no cache após o primeiro carregamento. A partir daí, a cidade e todos os recursos procedurais continuam disponíveis offline. Conteúdo carregado no player do carro ainda depende da fonte externa escolhida.
+O Service Worker armazena `index.html` e `game.js` após o primeiro acesso. A cidade permanece disponível offline; o conteúdo do player do carro depende da conexão e da disponibilidade da fonte escolhida.
 
 ## Desenvolvimento
 
@@ -22,27 +22,74 @@ npm run build
 npm run dev
 ```
 
-O código-fonte está em `src/app.js`. O comando de build empacota Three.js e a aplicação em `game.js`, sem dependências externas em tempo de execução.
+O código-fonte está em `src/app.js`. O build empacota Three.js e a aplicação em `game.js`, sem bibliotecas externas carregadas durante o jogo.
 
-## Experiência
+## Reformulação visual
 
-- Cidade 3D única chamada Nova Aurora
-- Direção integralmente em primeira pessoa
-- Cockpit modelado com volante, painel, capô e para-brisa
-- Entrada e saída do veículo a qualquer momento quando ele estiver parado
-- Exploração a pé com câmera livre, corrida, salto e colisões
-- Centenas de edifícios procedurais com fachadas iluminadas
-- Avenidas, cruzamentos, calçadas, parques, árvores e sinalização
-- Tráfego urbano independente
-- Chuva dinâmica e pavimento molhado
-- Iluminação física, reflexos, sombras suaves, neblina e tone mapping ACES
-- Bloom seletivo em letreiros, faróis e iluminação urbana
-- Menu cinematográfico renderizado sobre a cidade real
-- Presets Frio, Equilibrado, Alto e Cyberpunk
-- Resolução dinâmica e limite de 60 FPS
-- Salvamento local da posição, ajustes e endereço do player
+- Céu físico de fim de tarde com gradiente atmosférico, sol e nuvens
+- Iluminação solar quente com sombras suaves acompanhando o jogador
+- Tone mapping ACES e exposição adaptada por preset
+- Ambient occlusion em qualidade Alta e Ultra Realista
+- Bloom seletivo apenas em faróis e elementos emissivos
+- Neblina linear para profundidade atmosférica
+- Asfalto procedural com granulação, manchas e rachaduras
+- Calçadas texturizadas e marcações viárias sem emissão artificial
+- Fachadas de concreto, vidro, pedra e metal com reflexos naturais
+- Materiais PBR com níveis próprios de rugosidade e metalicidade
+- Centenas de edifícios instanciados para reduzir draw calls
+- Tráfego, parques, árvores, cruzamentos e iluminação urbana
+- Interface com paleta sóbria, acabamento de luxo e sem estética neon excessiva
+
+## Automóvel de luxo
+
+O Aurelis S9 foi remodelado como um sedã híbrido de luxo:
+
+- Pintura escura com clear coat e reflexos físicos
+- Grade e rodas com acabamento metálico
+- Faróis quentes e lanternas traseiras
+- Couro escuro, acabamento interno claro e faixa de madeira
+- Detalhes cromados e iluminação ambiente
+- Painel de instrumentos digital atualizado em tempo real
+- Tela multimídia grande e interativa
+- Volante, pilares, capô e interior visíveis em primeira pessoa
+
+## Multimídia
+
+O player inicia com o endereço:
+
+```text
+https://invidious.nerdvpn.de/embed/5dPwBWvmcbQ
+```
+
+Pressione `R` dentro do carro para liberar o mouse. O endereço pode ser substituído por outro link ou por um código completo de `iframe`.
+
+Links comuns do YouTube, YouTube Music, `youtu.be` e Vimeo são convertidos para seus formatos incorporáveis. URLs que já apontam para um player `embed` são usadas diretamente.
+
+Sites podem bloquear incorporação usando CSP ou `X-Frame-Options`. Essa política pertence à fonte e não é contornada pelo jogo. Se a instância Invidious estiver indisponível, basta colar outra instância ou player compatível.
+
+## Otimização para computadores fracos
+
+WebGL é apropriado para este projeto porque permite usar a GPU diretamente no navegador sem exigir instalação ou um executável específico. A implementação utiliza WebGL2 quando disponível e mantém fallback WebGL.
+
+O jogo detecta a quantidade aproximada de memória e núcleos do computador para selecionar um preset inicial. Também ajusta a resolução durante a execução quando identifica queda de desempenho.
+
+| Preset | Resolução interna | Sombras | Ambient occlusion | Bloom |
+|---|---:|---:|---:|---:|
+| Frio | 55% dinâmica | Desligadas | Desligado | Desligado |
+| Equilibrado | 72% dinâmica | 1024 px | Desligado | Leve |
+| Alto | 90% dinâmica | 1536 px | Ligado | Seletivo |
+| Ultra Realista | 100% dinâmica | 2048 px | Ligado | Seletivo |
+
+Outras otimizações:
+
+- Limite rígido de 60 FPS
+- Geometria instanciada para prédios, árvores, postes e calçadas
+- Resolução limitada conforme a densidade de pixels do monitor
+- Distância de renderização própria para cada preset
+- Neblina ocultando geometria distante
+- Chuva desativada no cenário de fim de tarde
 - Pausa automática quando a aba fica oculta
-- Interface responsiva para computadores e notebooks
+- Cache offline de todos os recursos do jogo
 
 ## Controles
 
@@ -52,46 +99,31 @@ O código-fonte está em `src/app.js`. O comando de build empacota Three.js e a 
 | Acelerar / andar | `W` ou `↑` |
 | Frear / ré | `S` ou `↓` |
 | Virar / mover lateralmente | `A` `D` ou `←` `→` |
-| Nitro / correr | `Shift` |
+| Aceleração máxima / correr | `Shift` |
 | Sair ou entrar no carro | `F` |
-| Abrir multimídia do carro | `R` |
+| Abrir a tela multimídia | `R` |
 | Saltar a pé | `Espaço` |
 | Pausar | `Esc` |
 
-Clique na imagem do jogo para capturar novamente o mouse depois de fechar um menu.
-
-## Multimídia do carro
-
-1. Entre no veículo.
-2. Pressione `R` para abrir o painel interativo.
-3. Cole um link completo ou um código de `iframe` no campo inferior.
-4. Pressione **CARREGAR**.
-5. Use o mouse diretamente sobre o player para iniciar, pausar ou alterar o volume.
-6. Pressione `R`, `Esc` ou o botão `×` para voltar à direção.
-
-Links comuns do YouTube, YouTube Music, `youtu.be` e Vimeo são convertidos automaticamente para seus players incorporáveis. Endereços que já apontam para um player `embed` também são aceitos.
-
-Alguns sites enviam `X-Frame-Options` ou uma política CSP que proíbe incorporação. Essa decisão pertence ao site de origem e não pode ser contornada pelo jogo. O navegador também exige uma ação do usuário para iniciar áudio ou vídeo.
-
 ## Salvamento
 
-O progresso é salvo em `localStorage` a cada 60 segundos, ao pausar e ao voltar para o menu. São preservados:
+O progresso é salvo localmente a cada 60 segundos, ao pausar e ao voltar ao menu. São preservados:
 
 - Posição e orientação do veículo
-- Link utilizado no painel multimídia
-- Qualidade gráfica
+- Endereço usado na tela multimídia
+- Preset gráfico
 - Campo de visão
 - Volume do veículo
-
-O botão **CONTINUAR** aparece disponível quando existe um salvamento local.
 
 ## Tecnologia
 
 - Three.js 0.170
 - WebGL2 com fallback WebGL
-- Materiais PBR e `MeshPhysicalMaterial`
-- EffectComposer e Unreal Bloom
-- Geometria, texturas, fachadas e letreiros gerados em tempo de execução
-- Web Audio para o motor elétrico
-- Service Worker para cache offline
-- HTML, CSS e JavaScript sem assets gráficos externos
+- EffectComposer
+- SSAO
+- Unreal Bloom
+- Materiais Standard e Physical
+- Geometria instanciada
+- Texturas procedurais via Canvas
+- Web Audio
+- Service Worker
