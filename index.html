@@ -4,401 +4,90 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#05090b">
+<meta name="description" content="NEON WORLD, experiência urbana 3D em primeira pessoa">
 <title>NEON WORLD</title>
 <style>
-:root{--ciano:#62f7f0;--ciano2:#00bfc7;--magenta:#ff3fae;--amarelo:#d9ff63;--fundo:#05090b;--painel:rgba(7,15,18,.78);--linha:rgba(157,247,239,.18);--texto:#eef7f5;--muted:#88a09f;--perigo:#ff5c68;--escala:1;--scan:.08}
+:root{--cyan:#6ffbf0;--cyan2:#12bfc4;--pink:#ff3c9d;--lime:#dbff68;--ink:#05090b;--panel:rgba(6,15,17,.82);--line:rgba(135,245,235,.2);--text:#edf8f5;--muted:#829b98;--danger:#ff5f70}
 *{box-sizing:border-box}
-html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--fundo);color:var(--texto);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;user-select:none}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--ink);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;user-select:none}
 button,input,select{font:inherit}
 button{color:inherit}
 [hidden]{display:none!important}
-#scene,#mundo{position:fixed;inset:0;width:100%;height:100%}
-#scene{z-index:0;background:#05090b}
-#mundo{z-index:20;background:#071013}
-.fx{position:fixed;inset:0;pointer-events:none;z-index:2}
-.grain{opacity:.12;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.65'/%3E%3C/svg%3E");mix-blend-mode:soft-light}
-.scanlines{opacity:var(--scan);background:repeating-linear-gradient(0deg,transparent 0,transparent 3px,#8afff1 4px)}
-.vignette{background:radial-gradient(circle at 63% 44%,transparent 20%,rgba(2,5,6,.15) 52%,rgba(2,5,6,.88) 108%)}
-#boot{position:fixed;inset:0;z-index:200;background:#030708;display:grid;place-items:center;transition:opacity .55s ease,visibility .55s}
-#boot.sair{opacity:0;visibility:hidden}
-.boot-inner{width:min(580px,78vw)}
-.boot-mark{display:flex;align-items:center;gap:16px;margin-bottom:28px}
-.boot-glyph{width:42px;height:42px;border:1px solid var(--ciano);transform:rotate(45deg);box-shadow:0 0 24px rgba(98,247,240,.35);position:relative}
-.boot-glyph:after{content:"";position:absolute;inset:8px;border:1px solid var(--magenta)}
-.boot-title{font-weight:900;letter-spacing:.34em;font-size:15px}
-.boot-line{height:2px;background:#132023;overflow:hidden}
-.boot-line i{display:block;width:0;height:100%;background:linear-gradient(90deg,var(--ciano),var(--magenta));box-shadow:0 0 16px var(--ciano);animation:carregar 1.3s cubic-bezier(.2,.8,.2,1) forwards}
-.boot-status{display:flex;justify-content:space-between;margin-top:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.2em;font-size:9px}
-@keyframes carregar{to{width:100%}}
-#menu{position:fixed;inset:0;z-index:5;display:grid;grid-template-rows:auto 1fr auto;padding:30px 42px 22px;transition:opacity .5s,transform .5s}
-#menu.oculto{opacity:0;pointer-events:none;transform:scale(1.015)}
-.menu-top{display:flex;justify-content:space-between;align-items:center}
-.wordmark{display:flex;align-items:center;gap:13px}
-.logo-orbit{width:29px;height:29px;border:1px solid rgba(98,247,240,.75);transform:rotate(45deg);position:relative;box-shadow:0 0 16px rgba(98,247,240,.2)}
-.logo-orbit:before,.logo-orbit:after{content:"";position:absolute}
-.logo-orbit:before{inset:5px;border:1px solid rgba(255,63,174,.8)}
-.logo-orbit:after{width:4px;height:4px;background:white;top:-3px;left:4px;box-shadow:0 0 10px var(--ciano)}
-.wordmark strong{font-weight:900;letter-spacing:.24em;font-size:13px}
-.wordmark small{display:block;color:var(--muted);font-size:8px;letter-spacing:.3em;margin-top:3px}
-.top-status{display:flex;gap:8px}
-.status-chip{height:34px;border:1px solid var(--linha);background:rgba(5,12,14,.45);backdrop-filter:blur(10px);display:flex;align-items:center;gap:9px;padding:0 13px;color:#aec1bf;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
-.status-chip b{color:var(--ciano);font-size:9px}
-.menu-body{display:grid;grid-template-columns:minmax(320px,470px) 1fr;align-items:center;position:relative}
-.hero-copy{padding-left:5vw;margin-top:-1vh}
-.eyebrow{display:flex;align-items:center;gap:12px;color:var(--ciano);text-transform:uppercase;letter-spacing:.3em;font-size:9px;font-weight:700;margin-bottom:16px}
-.eyebrow:before{content:"";width:28px;height:1px;background:var(--ciano);box-shadow:0 0 8px var(--ciano)}
-.title{margin:0 0 8px;font-size:clamp(55px,7.6vw,116px);font-weight:950;line-height:.78;letter-spacing:-.075em;transform:scaleX(.83);transform-origin:left;color:#ecf8f6;text-shadow:0 0 1px white,0 0 35px rgba(98,247,240,.15)}
-.title span{display:block;color:transparent;-webkit-text-stroke:1px rgba(214,255,252,.76);text-shadow:5px 5px 0 rgba(255,63,174,.12),-5px -4px 0 rgba(98,247,240,.09)}
-.tagline{max-width:395px;color:#8ca09f;font-size:11px;line-height:1.6;letter-spacing:.06em;text-transform:uppercase;margin:18px 0 29px}
-.main-nav{width:min(365px,90vw);display:flex;flex-direction:column;gap:5px}
-.nav-btn{height:47px;border:0;border-left:1px solid rgba(138,174,171,.24);background:linear-gradient(90deg,rgba(13,24,27,.55),rgba(9,18,20,.06));display:grid;grid-template-columns:40px 1fr 30px;align-items:center;text-align:left;padding:0 12px;cursor:pointer;letter-spacing:.2em;font-size:11px;font-weight:750;transition:.2s;position:relative;overflow:hidden}
-.nav-btn:before{content:"";position:absolute;inset:0;transform:translateX(-102%);background:linear-gradient(90deg,rgba(98,247,240,.17),rgba(98,247,240,.02));transition:transform .32s ease}
-.nav-btn:hover,.nav-btn:focus-visible{outline:none;border-left:3px solid var(--ciano);color:white;padding-left:16px;text-shadow:0 0 12px rgba(98,247,240,.5)}
-.nav-btn:hover:before,.nav-btn:focus-visible:before{transform:none}
-.nav-btn em{font-style:normal;color:#4e6464;font-size:8px;z-index:1}
-.nav-btn span,.nav-btn i{z-index:1}
-.nav-btn i{font-style:normal;color:var(--ciano);opacity:0;transform:translateX(-8px);transition:.2s}
-.nav-btn:hover i,.nav-btn:focus-visible i{opacity:1;transform:none}
-.nav-btn.primary{height:53px;background:linear-gradient(90deg,rgba(41,111,109,.36),rgba(9,18,20,.06));border-left:2px solid var(--ciano);color:#fff}
-.nav-btn.primary em{color:var(--ciano)}
-.destination-preview{position:absolute;right:2vw;bottom:7vh;width:275px;border:1px solid var(--linha);background:rgba(5,12,14,.56);backdrop-filter:blur(14px);padding:13px}
-.preview-img{height:115px;position:relative;overflow:hidden;background:linear-gradient(150deg,#112f36,#0c1820 45%,#311b31)}
-.preview-img:before{content:"";position:absolute;inset:30px -10px -20px;background:repeating-linear-gradient(90deg,transparent 0 16px,rgba(98,247,240,.16) 17px 18px),linear-gradient(170deg,transparent 0 38%,#061012 39%);transform:skewY(-5deg)}
-.preview-img:after{content:"SÃO PAULO — 23°33’S";position:absolute;left:10px;bottom:8px;color:white;font-size:7px;letter-spacing:.18em}
-.live-dot{position:absolute;right:8px;top:8px;background:rgba(4,10,12,.8);color:var(--ciano);font-size:7px;letter-spacing:.16em;padding:5px 7px}
-.live-dot:before{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--ciano);box-shadow:0 0 8px var(--ciano);margin-right:5px}
-.preview-meta{display:flex;justify-content:space-between;margin-top:11px;align-items:end}
-.preview-meta strong{display:block;font-size:10px;letter-spacing:.16em}
-.preview-meta small{color:var(--muted);font-size:8px;letter-spacing:.08em}
-.preview-meta b{font-weight:500;font-size:9px;color:var(--ciano)}
-.menu-bottom{border-top:1px solid rgba(136,178,174,.12);padding-top:15px;display:flex;justify-content:space-between;align-items:center;color:#607271;font-size:8px;text-transform:uppercase;letter-spacing:.13em}
-.bottom-keys{display:flex;gap:20px}
-kbd{font:inherit;color:#c7d7d5;border:1px solid rgba(172,219,215,.22);padding:3px 6px;background:rgba(14,23,25,.6);margin-right:6px}
-.build{display:flex;gap:22px;align-items:center}
-.build b{color:#8ea3a1;font-weight:500}
-.modal-layer{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:rgba(2,6,7,.66);backdrop-filter:blur(12px);opacity:0;pointer-events:none;transition:.25s}
-.modal-layer.aberto{opacity:1;pointer-events:auto}
-.modal{width:min(940px,calc(100vw - 44px));max-height:calc(100vh - 54px);overflow:auto;border:1px solid rgba(134,238,229,.22);background:linear-gradient(145deg,rgba(10,21,24,.98),rgba(5,11,13,.97));box-shadow:0 30px 100px #000,0 0 60px rgba(0,216,207,.06);display:none}
-.modal.ativo{display:block;animation:modalin .3s ease both}
-@keyframes modalin{from{opacity:0;transform:translateY(12px) scale(.985)}}
-.modal-head{height:72px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--linha);position:sticky;top:0;background:rgba(8,18,20,.96);z-index:2}
-.modal-title small{display:block;color:var(--ciano);font-size:7px;letter-spacing:.28em;margin-bottom:5px}
-.modal-title h2{margin:0;font-size:15px;letter-spacing:.16em}
-.fechar{width:34px;height:34px;border:1px solid var(--linha);background:transparent;cursor:pointer;color:#8fa4a2;transition:.2s}
-.fechar:hover{color:white;border-color:var(--ciano)}
-.modal-body{padding:25px 26px 28px}
-.city-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.city-card{height:165px;border:1px solid rgba(137,189,185,.13);background:linear-gradient(150deg,#0e2025,#091215);padding:16px;text-align:left;cursor:pointer;position:relative;overflow:hidden;transition:.2s}
-.city-card:before{content:"";position:absolute;left:0;right:0;bottom:0;height:52%;opacity:.4;background:repeating-linear-gradient(90deg,transparent 0 22px,rgba(98,247,240,.2) 23px 24px),linear-gradient(170deg,transparent 40%,#10292e 42%)}
-.city-card:hover,.city-card.selecionada{border-color:rgba(98,247,240,.7);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.25)}
-.city-card.selecionada:after{content:"SELECIONADO";position:absolute;right:10px;bottom:9px;color:var(--ciano);font-size:6px;letter-spacing:.2em}
-.city-card small,.city-card strong,.city-card span{position:relative;z-index:1;display:block}
-.city-card small{font-size:7px;letter-spacing:.2em;color:var(--ciano);margin-bottom:38px}
-.city-card strong{font-size:16px;letter-spacing:.08em}
-.city-card span{font-size:8px;color:#819391;margin-top:5px}
-.start-row{margin-top:20px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;padding-top:18px;border-top:1px solid var(--linha)}
-.mode-select{display:flex;gap:7px}
-.mode{border:1px solid var(--linha);background:#091315;padding:10px 14px;color:#829794;font-size:8px;letter-spacing:.12em;cursor:pointer}
-.mode.ativo{border-color:var(--ciano);color:var(--ciano);background:rgba(98,247,240,.08)}
-.cta{border:1px solid var(--ciano);background:var(--ciano);color:#041011;height:44px;padding:0 25px;font-size:9px;letter-spacing:.2em;font-weight:900;cursor:pointer;box-shadow:0 0 28px rgba(98,247,240,.17);transition:.2s}
-.cta:hover{background:white;border-color:white;box-shadow:0 0 32px rgba(255,255,255,.24)}
-.settings-grid{display:grid;grid-template-columns:210px 1fr;gap:24px}
-.settings-tabs{display:flex;flex-direction:column;gap:4px}
-.tab{border:0;border-left:1px solid var(--linha);background:rgba(255,255,255,.015);color:#829593;height:43px;text-align:left;padding:0 16px;font-size:9px;letter-spacing:.15em;cursor:pointer}
-.tab.ativo{border-left:2px solid var(--ciano);color:white;background:linear-gradient(90deg,rgba(98,247,240,.1),transparent)}
-.setting-panel{display:none}
-.setting-panel.ativo{display:block}
-.setting-row{min-height:58px;border-bottom:1px solid rgba(130,172,168,.1);display:flex;align-items:center;justify-content:space-between;gap:20px}
-.setting-row label strong{display:block;font-size:10px;letter-spacing:.09em}
-.setting-row label small{display:block;color:#687b79;font-size:8px;margin-top:5px}
-.setting-row select{background:#081113;border:1px solid var(--linha);color:#cfe2df;padding:9px 31px 9px 11px;font-size:9px;min-width:180px}
-.setting-row input[type=range]{accent-color:var(--ciano);width:180px}
-.toggle{width:43px;height:23px;border:1px solid #344644;background:#0a1214;border-radius:20px;position:relative;cursor:pointer}
-.toggle:after{content:"";position:absolute;width:15px;height:15px;border-radius:50%;left:3px;top:3px;background:#657573;transition:.2s}
-.toggle.on{border-color:var(--ciano);background:rgba(98,247,240,.12)}
-.toggle.on:after{left:23px;background:var(--ciano);box-shadow:0 0 10px var(--ciano)}
-.garage-show{display:grid;grid-template-columns:1.1fr .9fr;min-height:430px}
-.vehicle-stage{position:relative;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 68%,rgba(42,218,208,.14),transparent 45%),linear-gradient(155deg,#0c1d21,#060b0d);overflow:hidden}
-.vehicle-stage:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 49.8%,rgba(98,247,240,.09) 50%,transparent 50.2%),linear-gradient(0deg,transparent 49.8%,rgba(98,247,240,.07) 50%,transparent 50.2%);background-size:70px 70px;transform:perspective(300px) rotateX(60deg) scale(1.5);top:45%}
-.vehicle-art{width:270px;height:120px;position:relative;filter:drop-shadow(0 20px 15px rgba(0,0,0,.8));z-index:1;transition:.35s}
-.vehicle-art .body{position:absolute;left:18px;right:18px;top:34px;height:55px;border-radius:55% 45% 18% 15%;background:linear-gradient(155deg,#e9ffff 0,#43d4d1 18%,#0b777d 47%,#04343a 72%);box-shadow:inset 0 4px rgba(255,255,255,.45),0 0 30px rgba(98,247,240,.25)}
-.vehicle-art .cabin{position:absolute;left:76px;top:8px;width:112px;height:53px;border-radius:50% 55% 0 0;background:linear-gradient(145deg,#9de9e9,#10282e 35%,#071419 75%);border-bottom:3px solid #146a70}
-.vehicle-art .wheel{position:absolute;top:72px;width:43px;height:43px;border-radius:50%;background:radial-gradient(circle,#80f2ea 0 9%,#132126 10% 33%,#020506 34% 65%,#344246 66% 70%,#050708 71%);border:2px solid #111}
-.vehicle-art .wheel.a{left:42px}.vehicle-art .wheel.b{right:43px}
-.vehicle-art[data-type=moto]{width:220px}
-.vehicle-art[data-type=moto] .body{left:58px;right:55px;top:50px;height:30px;border-radius:60% 20%}
-.vehicle-art[data-type=moto] .cabin{left:99px;top:23px;width:12px;height:45px;background:#a9fffa;border-radius:4px;transform:rotate(-22deg)}
-.vehicle-art[data-type=moto] .wheel.a{left:29px}.vehicle-art[data-type=moto] .wheel.b{right:25px}
-.vehicle-art[data-type=onibus]{width:310px}
-.vehicle-art[data-type=onibus] .body{left:5px;right:5px;top:5px;height:89px;border-radius:12px;background:linear-gradient(160deg,#aefbf5,#1a9597 30%,#08383d 70%)}
-.vehicle-art[data-type=onibus] .cabin{left:27px;top:14px;width:240px;height:33px;border-radius:6px;background:repeating-linear-gradient(90deg,#0b2026 0 31px,#5bd0cf 32px 34px)}
-.vehicle-art[data-type=aviao] .body{left:18px;right:18px;top:48px;height:28px;border-radius:70% 80% 30% 30%}
-.vehicle-art[data-type=aviao] .body:after{content:"";position:absolute;width:170px;height:34px;left:36px;top:-3px;background:linear-gradient(#8ef2ee,#197b82);clip-path:polygon(0 42%,45% 0,100% 42%,50% 75%,4% 100%)}
-.vehicle-art[data-type=aviao] .cabin{left:180px;top:42px;width:26px;height:20px}
-.vehicle-art[data-type=aviao] .wheel{display:none}
-.vehicle-art[data-type=helicoptero] .body{left:65px;right:42px;top:40px;height:57px;border-radius:55% 55% 30% 35%}
-.vehicle-art[data-type=helicoptero] .body:after{content:"";position:absolute;left:-90px;top:16px;width:110px;height:8px;background:#196b6e;clip-path:polygon(0 20%,100% 0,100% 100%,0 80%)}
-.vehicle-art[data-type=helicoptero] .cabin{left:130px;top:46px;width:58px;height:42px}
-.vehicle-art[data-type=helicoptero] .wheel{display:none}
-.vehicle-art[data-type=helicoptero]:after{content:"";position:absolute;width:245px;height:3px;background:#b7fffa;left:20px;top:25px;box-shadow:0 0 8px var(--ciano)}
-.vehicle-info{padding:33px 30px;background:#081214}
-.vehicle-index{color:var(--ciano);font-size:8px;letter-spacing:.22em}
-.vehicle-info h3{font-size:30px;margin:12px 0 5px;letter-spacing:-.02em}
-.vehicle-info>p{color:#728684;font-size:9px;line-height:1.6;margin:0 0 26px}
-.stat{display:grid;grid-template-columns:90px 1fr 35px;align-items:center;gap:9px;margin:12px 0;font-size:8px;letter-spacing:.1em;color:#849895}
-.stat i{height:2px;background:#1a2a2b;position:relative}
-.stat i:after{content:"";position:absolute;left:0;top:0;height:100%;width:var(--val);background:linear-gradient(90deg,var(--ciano2),var(--ciano));box-shadow:0 0 8px rgba(98,247,240,.4)}
-.vehicle-list{display:flex;gap:5px;margin-top:26px}
-.vehicle-pick{width:42px;height:35px;border:1px solid var(--linha);background:#0a1618;color:#708482;font-size:8px;cursor:pointer}
-.vehicle-pick.ativo{border-color:var(--ciano);color:var(--ciano)}
-.vehicle-info .cta{width:100%;margin-top:19px}
-.credits{max-width:600px;margin:auto;text-align:center;padding:30px 10px}
-.credits .big-logo{font-size:46px;font-weight:950;letter-spacing:-.06em;margin:15px 0;color:transparent;-webkit-text-stroke:1px var(--ciano)}
-.credits p{font-size:10px;line-height:1.8;color:#8ca09f}
-.credits hr{border:0;border-top:1px solid var(--linha);margin:25px}
-#jogo{position:fixed;inset:0;z-index:20;opacity:0;pointer-events:none;transition:opacity .5s}
-#jogo.ativo{opacity:1;pointer-events:auto}
-.hud{position:fixed;inset:0;z-index:22;pointer-events:none}
-.hud-top{position:absolute;top:22px;left:50%;transform:translateX(-50%);display:flex;align-items:center;background:rgba(4,10,12,.68);border:1px solid rgba(129,205,199,.18);backdrop-filter:blur(10px);height:39px}
-.hud-top>div{padding:0 17px;border-right:1px solid var(--linha);height:100%;display:flex;align-items:center;gap:8px;font-size:8px;letter-spacing:.14em}
-.hud-top>div:last-child{border:0}
-.hud-top b{font-size:10px;color:white}.hud-top span{color:var(--ciano)}
-.zone-tag{position:absolute;top:24px;left:28px}
-.zone-tag small{display:block;color:var(--ciano);font-size:7px;letter-spacing:.25em}
-.zone-tag strong{display:block;font-size:13px;letter-spacing:.15em;margin-top:5px}
-.zone-tag i{display:block;width:34px;height:1px;background:var(--ciano);margin-top:8px;box-shadow:0 0 8px var(--ciano)}
-.minimap-box{position:absolute;left:27px;bottom:28px;width:178px;height:178px;border-radius:50%;padding:7px;background:rgba(5,11,13,.78);border:1px solid rgba(98,247,240,.32);box-shadow:0 0 0 6px rgba(4,10,12,.38),0 12px 40px rgba(0,0,0,.5);overflow:hidden}
-#minimapa{width:100%;height:100%;border-radius:50%;background:#081315}
-.mini-n{position:absolute;top:11px;left:50%;transform:translateX(-50%);font-size:7px;color:var(--ciano)}
-.mini-meta{position:absolute;left:9px;right:9px;bottom:8px;height:25px;background:rgba(5,11,13,.82);display:flex;justify-content:center;align-items:center;gap:6px;font-size:7px;letter-spacing:.13em;color:#b1c3c1}
-.mini-meta b{color:var(--ciano)}
-.speed-box{position:absolute;right:28px;bottom:27px;width:210px;height:150px;background:linear-gradient(135deg,transparent 10%,rgba(4,11,13,.78) 11%);border-right:1px solid rgba(98,247,240,.28);padding:22px 22px 16px;text-align:right}
-.speed-num{font:800 64px/1 ui-monospace,"SFMono-Regular",monospace;letter-spacing:-.08em;text-shadow:0 0 18px rgba(98,247,240,.2)}
-.speed-num small{font:600 8px ui-sans-serif,system-ui;letter-spacing:.18em;color:var(--ciano);margin-left:5px}
-.vehicle-name{font-size:8px;color:#819492;letter-spacing:.2em;margin-top:6px}
-.meters{display:flex;gap:5px;margin-top:12px}
-.meter{flex:1;text-align:left}
-.meter label{display:flex;justify-content:space-between;font-size:6px;letter-spacing:.12em;color:#849593;margin-bottom:4px}
-.meter i{display:block;height:2px;background:#223032;overflow:hidden}
-.meter i b{display:block;height:100%;width:var(--v);background:var(--ciano);box-shadow:0 0 7px var(--ciano)}
-.radio-widget{pointer-events:auto;position:absolute;right:28px;top:26px;width:260px;background:rgba(5,12,14,.78);border:1px solid rgba(119,202,195,.2);backdrop-filter:blur(14px);transition:.25s;overflow:hidden}
-.radio-main{height:65px;padding:10px 12px;display:grid;grid-template-columns:41px 1fr 22px;align-items:center;gap:10px;cursor:pointer}
-.album{width:41px;height:41px;background:conic-gradient(from 45deg,var(--magenta),#351e53,var(--ciano),#153444,var(--magenta));position:relative;display:grid;place-items:center}
-.album:before{content:"";width:19px;height:19px;background:#071012;border-radius:50%;border:1px solid rgba(255,255,255,.2)}
-.album:after{content:"";width:4px;height:4px;border-radius:50%;background:var(--ciano);position:absolute}
-.track small{color:var(--ciano);font-size:6px;letter-spacing:.16em}.track strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9px;letter-spacing:.08em;margin:5px 0}.track span{font-size:7px;color:#738785}
-.radio-state{color:var(--ciano);font-size:12px}
-.radio-drawer{max-height:0;border-top:0 solid var(--linha);transition:max-height .3s ease;padding:0 12px;overflow:hidden}
-.radio-widget.expandido .radio-drawer{max-height:250px;border-top-width:1px;padding-bottom:12px}
-.wave{height:32px;display:flex;align-items:center;justify-content:center;gap:3px}
-.wave i{width:2px;height:4px;background:var(--ciano)}
-.radio-widget.tocando .wave i{animation:wave .8s ease-in-out infinite alternate}.wave i:nth-child(2n){animation-delay:-.3s}.wave i:nth-child(3n){animation-delay:-.6s}
-@keyframes wave{to{height:24px}}
-.radio-controls{display:flex;justify-content:center;gap:8px}
-.radio-controls button{pointer-events:auto;border:1px solid var(--linha);background:#0a1517;color:#a9bcba;width:34px;height:29px;cursor:pointer}
-.radio-controls button:hover{border-color:var(--ciano);color:var(--ciano)}
-.radio-controls .power{width:44px;border-color:rgba(98,247,240,.45);color:var(--ciano)}
-.radio-source{display:flex;gap:6px;margin-top:10px}
-.radio-source button{pointer-events:auto;flex:1;height:28px;border:1px solid var(--linha);background:transparent;color:#78908d;font-size:6px;letter-spacing:.1em;cursor:pointer}
-.radio-source button:hover{color:white;border-color:#58736f}
-.prompt{position:absolute;left:50%;bottom:53px;transform:translateX(-50%) translateY(12px);background:rgba(5,12,14,.82);border:1px solid var(--linha);padding:10px 15px;font-size:8px;letter-spacing:.13em;opacity:0;transition:.2s}
-.prompt.visivel{opacity:1;transform:translateX(-50%)}
-.prompt kbd{color:var(--ciano)}
-.control-tip{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);color:rgba(191,218,214,.58);font-size:7px;letter-spacing:.12em;white-space:nowrap}
-.crosshair{position:absolute;left:50%;top:50%;width:5px;height:5px;border:1px solid rgba(98,247,240,.7);transform:translate(-50%,-50%) rotate(45deg);opacity:.5}
-.toast{position:absolute;top:92px;left:50%;transform:translate(-50%,-12px);padding:10px 15px;background:rgba(5,12,14,.92);border-left:2px solid var(--ciano);font-size:8px;letter-spacing:.12em;opacity:0;transition:.25s}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-#pause{position:fixed;inset:0;z-index:60;background:rgba(2,6,7,.66);backdrop-filter:blur(16px);display:none;align-items:center;padding-left:10vw}
-#pause.ativo{display:flex}
-.pause-panel{width:410px}
-.pause-panel .eyebrow{margin-bottom:13px}
-.pause-panel h2{font-size:54px;margin:0 0 35px;letter-spacing:-.05em}
-.pause-nav{display:flex;flex-direction:column;gap:6px}
-.pause-nav button{height:47px;border:0;border-left:1px solid var(--linha);background:linear-gradient(90deg,rgba(16,31,34,.7),transparent);text-align:left;padding:0 18px;color:#a8b9b7;font-size:9px;letter-spacing:.16em;cursor:pointer}
-.pause-nav button:hover{border-left:2px solid var(--ciano);color:white;background:linear-gradient(90deg,rgba(98,247,240,.12),transparent)}
-.pause-save{margin-top:25px;color:#677a78;font-size:7px;letter-spacing:.14em}
-@media(max-width:850px){#menu{padding:22px}.menu-body{grid-template-columns:1fr}.hero-copy{padding-left:2vw}.destination-preview{display:none}.title{font-size:70px}.top-status .status-chip:first-child{display:none}.city-grid{grid-template-columns:1fr 1fr}.garage-show{grid-template-columns:1fr}.vehicle-stage{min-height:280px}.settings-grid{grid-template-columns:1fr}.settings-tabs{flex-direction:row;overflow:auto}.tab{min-width:120px}.zone-tag{display:none}.radio-widget{right:14px;top:14px}.minimap-box{width:135px;height:135px;left:15px;bottom:18px}.speed-box{right:14px;bottom:16px;transform:scale(.85);transform-origin:bottom right}}
-@media(max-width:540px){#menu{padding:18px 15px 14px}.top-status{display:none}.menu-body{align-items:end;padding-bottom:38px}.hero-copy{padding:0}.title{font-size:58px}.tagline{font-size:9px;margin:14px 0}.menu-bottom .build{display:none}.main-nav{width:100%}.city-grid{grid-template-columns:1fr}.city-card{height:105px}.city-card small{margin-bottom:15px}.start-row{grid-template-columns:1fr}.mode-select{overflow:auto}.modal-body{padding:16px}.hud-top{top:12px}.hud-top>div{padding:0 8px}.hud-top>div:nth-child(2){display:none}.radio-widget{width:210px}.control-tip{display:none}.speed-box{transform:scale(.7)}.prompt{bottom:160px}.minimap-box{transform:scale(.76);transform-origin:bottom left}}
+#world{position:fixed;inset:0;width:100%;height:100%;display:block;background:#05090b;outline:0}
+#visualFx{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(circle at 50% 46%,transparent 20%,rgba(0,4,6,.12) 62%,rgba(0,3,5,.62) 120%)}
+#visualFx:before{content:"";position:absolute;inset:0;opacity:.055;background:repeating-linear-gradient(0deg,transparent 0,transparent 3px,#adfff7 4px)}
+#visualFx:after{content:"";position:absolute;inset:0;opacity:.1;mix-blend-mode:soft-light;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+#loading{position:fixed;inset:0;z-index:200;background:#030708;display:grid;place-items:center;transition:opacity .7s,visibility .7s}
+#loading.done{opacity:0;visibility:hidden}
+.loader{width:min(610px,80vw)}
+.loader-brand{display:flex;align-items:center;gap:17px;margin-bottom:29px}
+.diamond{width:39px;height:39px;border:1px solid var(--cyan);transform:rotate(45deg);position:relative;box-shadow:0 0 25px rgba(111,251,240,.25)}
+.diamond:before{content:"";position:absolute;inset:8px;border:1px solid var(--pink)}
+.diamond:after{content:"";position:absolute;width:4px;height:4px;border-radius:50%;background:#fff;left:2px;top:-3px;box-shadow:0 0 10px var(--cyan)}
+.loader-title{font-size:14px;font-weight:900;letter-spacing:.34em}.loader-sub{font-size:7px;color:#627673;letter-spacing:.26em;margin-top:6px}
+.loader-track{height:2px;background:#152225;overflow:hidden}.loader-track i{display:block;width:0;height:100%;background:linear-gradient(90deg,var(--cyan),var(--pink));box-shadow:0 0 15px var(--cyan);animation:load 2.1s cubic-bezier(.2,.85,.2,1) forwards}
+.loader-meta{display:flex;justify-content:space-between;color:#6f8380;font-size:8px;letter-spacing:.2em;margin-top:12px;text-transform:uppercase}
+@keyframes load{to{width:100%}}
+#menu{position:fixed;inset:0;z-index:10;display:grid;grid-template-rows:auto 1fr auto;padding:30px 42px 22px;transition:opacity .7s,transform .7s,visibility .7s}
+#menu.closed{opacity:0;transform:scale(1.02);visibility:hidden}
+.topbar{display:flex;justify-content:space-between;align-items:center}
+.brand{display:flex;gap:13px;align-items:center}.brand .diamond{width:27px;height:27px}.brand .diamond:before{inset:5px}.brand strong{display:block;font-size:12px;letter-spacing:.25em}.brand small{display:block;color:#617572;font-size:7px;letter-spacing:.25em;margin-top:4px}
+.statuses{display:flex;gap:8px}.chip{height:35px;display:flex;align-items:center;gap:8px;padding:0 13px;border:1px solid var(--line);background:rgba(5,13,15,.44);backdrop-filter:blur(12px);font-size:8px;letter-spacing:.14em;color:#9db0ad}.chip i{width:5px;height:5px;border-radius:50%;background:var(--cyan);box-shadow:0 0 9px var(--cyan)}.chip b{color:var(--cyan)}
+.menu-main{display:grid;grid-template-columns:minmax(490px,1fr) minmax(350px,.72fr);align-items:center;gap:6vw}
+.hero{padding-left:5vw;margin-top:-2vh}.overline{display:flex;align-items:center;gap:11px;color:var(--cyan);font-size:8px;font-weight:800;letter-spacing:.3em;text-transform:uppercase}.overline:before{content:"";width:31px;height:1px;background:var(--cyan);box-shadow:0 0 9px var(--cyan)}
+.hero h1{font-size:clamp(72px,9vw,138px);line-height:.72;letter-spacing:-.08em;margin:22px 0 25px;font-weight:950;transform:scaleX(.85);transform-origin:left;text-shadow:0 0 40px rgba(111,251,240,.13)}.hero h1 span{display:block;color:transparent;-webkit-text-stroke:1px rgba(225,255,252,.8);text-shadow:5px 5px 0 rgba(255,60,157,.11),-5px -4px 0 rgba(111,251,240,.07)}
+.hero-copy{max-width:470px;color:#98aaa7;font-size:11px;line-height:1.7;letter-spacing:.08em;text-transform:uppercase}.hero-copy b{color:#edf8f5;font-weight:600}
+.menu-actions{display:flex;gap:8px;margin-top:30px}.primary,.secondary{height:53px;border:1px solid var(--cyan);padding:0 25px;cursor:pointer;font-size:9px;font-weight:900;letter-spacing:.2em;transition:.25s}.primary{background:var(--cyan);color:#031012;box-shadow:0 0 28px rgba(111,251,240,.18)}.primary:hover{background:#fff;border-color:#fff;box-shadow:0 0 36px rgba(255,255,255,.25);transform:translateY(-2px)}.secondary{background:rgba(6,14,16,.58);backdrop-filter:blur(12px);color:#abc0bd;border-color:var(--line)}.secondary:hover{border-color:var(--cyan);color:var(--cyan)}
+.continue-note{height:28px;margin-top:10px;color:#5f7471;font-size:7px;letter-spacing:.14em;display:flex;align-items:center;gap:8px}.continue-note i{width:18px;height:1px;background:#415653}
+.city-card{justify-self:end;width:min(430px,38vw);border:1px solid rgba(135,245,235,.22);background:linear-gradient(145deg,rgba(7,17,20,.75),rgba(4,10,12,.58));backdrop-filter:blur(16px);padding:13px;box-shadow:0 25px 70px rgba(0,0,0,.35)}
+.city-visual{height:240px;position:relative;overflow:hidden;background:linear-gradient(150deg,rgba(29,71,78,.45),rgba(8,18,23,.75) 48%,rgba(53,24,48,.5))}.city-visual:before{content:"";position:absolute;inset:48px -30px -30px;background:repeating-linear-gradient(90deg,transparent 0 29px,rgba(111,251,240,.14) 30px 31px),linear-gradient(168deg,transparent 0 35%,rgba(4,11,13,.9) 36%);transform:skewY(-5deg)}.city-visual:after{content:"";position:absolute;left:-10%;right:-10%;bottom:11px;height:2px;background:linear-gradient(90deg,transparent,var(--pink),var(--cyan),transparent);box-shadow:0 0 17px var(--cyan)}
+.city-live{position:absolute;right:10px;top:10px;padding:6px 8px;background:rgba(3,9,11,.82);color:var(--cyan);font-size:6px;letter-spacing:.2em}.city-live:before{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--cyan);box-shadow:0 0 7px var(--cyan);margin-right:6px}
+.city-mark{position:absolute;left:17px;bottom:17px}.city-mark small{font-size:7px;letter-spacing:.18em;color:var(--cyan)}.city-mark strong{display:block;font-size:21px;letter-spacing:.08em;margin-top:5px}.city-mark span{display:block;font-size:7px;color:#8ba09d;margin-top:5px;letter-spacing:.09em}
+.city-data{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:10px;background:var(--line)}.city-data div{background:#071013;padding:12px}.city-data small{display:block;color:#647b78;font-size:6px;letter-spacing:.13em}.city-data b{display:block;color:#d6e7e4;font-size:10px;margin-top:6px;letter-spacing:.08em}
+.menu-footer{display:flex;justify-content:space-between;border-top:1px solid rgba(135,245,235,.12);padding-top:15px;color:#607572;font-size:7px;letter-spacing:.14em}.menu-footer div{display:flex;gap:24px}.menu-footer b{color:#92aaa7;font-weight:600}kbd{font:inherit;padding:3px 6px;border:1px solid rgba(135,245,235,.22);background:rgba(7,15,17,.62);color:#c9d9d7;margin-right:5px}
+#gameUi{position:fixed;inset:0;z-index:20;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .6s,visibility .6s}
+#gameUi.active{opacity:1;visibility:visible}.hud-left{position:absolute;left:26px;top:25px}.hud-left small,.hud-center small{display:block;color:var(--cyan);font-size:6px;letter-spacing:.25em}.hud-left strong{display:block;font-size:13px;letter-spacing:.16em;margin-top:6px}.hud-left i{display:block;width:35px;height:1px;background:var(--cyan);box-shadow:0 0 8px var(--cyan);margin-top:9px}
+.hud-center{position:absolute;top:24px;left:50%;transform:translateX(-50%);height:39px;border:1px solid var(--line);background:rgba(4,11,13,.7);backdrop-filter:blur(12px);display:flex;align-items:center}.hud-center>div{height:100%;padding:0 16px;border-right:1px solid var(--line);display:flex;align-items:center;gap:8px}.hud-center>div:last-child{border:0}.hud-center b{font-size:8px;letter-spacing:.13em}.hud-center span{color:var(--cyan);font-size:9px}
+.reticle{position:absolute;left:50%;top:50%;width:6px;height:6px;border:1px solid rgba(111,251,240,.65);transform:translate(-50%,-50%) rotate(45deg);box-shadow:0 0 8px rgba(111,251,240,.3)}
+.vehicle-hud{position:absolute;right:27px;bottom:24px;width:230px;background:linear-gradient(135deg,transparent 11%,rgba(4,11,13,.82) 11.5%);border-right:1px solid rgba(111,251,240,.35);padding:20px 20px 15px;text-align:right;transition:.25s}.vehicle-hud.foot{opacity:.38;transform:translateY(15px)}.speed{font:800 61px/1 ui-monospace,"SFMono-Regular",monospace;letter-spacing:-.08em}.speed small{font:700 7px ui-sans-serif,system-ui;color:var(--cyan);letter-spacing:.16em;margin-left:4px}.car-name{font-size:7px;color:#809693;letter-spacing:.2em;margin-top:5px}.rpm{height:2px;background:#172629;margin-top:14px;overflow:hidden}.rpm i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--pink));box-shadow:0 0 8px var(--cyan);transition:width .1s}.vehicle-meta{display:flex;justify-content:space-between;color:#657b78;font-size:6px;letter-spacing:.12em;margin-top:7px}.vehicle-meta b{color:#b9cecb}
+.mode-badge{position:absolute;right:27px;top:25px;border:1px solid var(--line);background:rgba(4,11,13,.68);padding:10px 12px;color:#91a7a4;font-size:7px;letter-spacing:.15em}.mode-badge b{color:var(--cyan)}
+.prompt{position:absolute;left:50%;bottom:57px;transform:translate(-50%,12px);padding:10px 15px;border:1px solid var(--line);background:rgba(4,11,13,.82);backdrop-filter:blur(10px);font-size:7px;letter-spacing:.14em;opacity:0;transition:.25s}.prompt.show{opacity:1;transform:translate(-50%,0)}.prompt kbd{color:var(--cyan)}
+.controls{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);color:rgba(180,207,203,.6);font-size:6px;letter-spacing:.13em;white-space:nowrap}
+.toast{position:absolute;left:50%;top:88px;transform:translate(-50%,-10px);padding:10px 15px;border-left:2px solid var(--cyan);background:rgba(4,11,13,.88);font-size:7px;letter-spacing:.14em;opacity:0;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}
+#radioDash{position:absolute;right:284px;bottom:20px;width:min(430px,35vw);height:250px;pointer-events:none;opacity:.82;transform:perspective(850px) rotateX(3deg) rotateY(-3deg) translateY(154px) scale(.68);transform-origin:bottom right;transition:.35s;filter:drop-shadow(0 18px 25px rgba(0,0,0,.7))}
+#radioDash.visible{transform:perspective(850px) rotateX(3deg) rotateY(-3deg) translateY(0) scale(1);opacity:1;pointer-events:auto}.dash-shell{position:absolute;inset:0;border:7px solid #12191a;border-radius:13px;background:#05090a;box-shadow:inset 0 0 0 1px #3b4b4a,0 0 0 2px #030506,0 0 25px rgba(0,0,0,.65);overflow:hidden}.dash-top{height:33px;padding:0 11px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #20302f;background:linear-gradient(#121b1c,#080d0e);font-size:6px;letter-spacing:.15em;color:#7f9693}.dash-top b{color:var(--cyan)}.dash-led{width:5px;height:5px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);display:inline-block;margin-right:6px}
+.player-wrap{position:absolute;left:8px;right:8px;top:41px;bottom:48px;background:#020506;border:1px solid #1d2e2e;overflow:hidden}.player-wrap iframe{width:100%;height:100%;border:0;background:#020506}.radio-form{position:absolute;left:8px;right:8px;bottom:8px;height:32px;display:flex;gap:5px}.radio-form input{min-width:0;flex:1;border:1px solid #263b39;background:#071011;color:#d9e8e5;padding:0 10px;font-size:7px;letter-spacing:.04em;outline:0;user-select:text}.radio-form input:focus{border-color:var(--cyan);box-shadow:0 0 10px rgba(111,251,240,.13)}.radio-form button{border:1px solid var(--cyan);background:rgba(111,251,240,.1);color:var(--cyan);font-size:6px;font-weight:800;letter-spacing:.13em;padding:0 10px;cursor:pointer}.radio-form button:hover{background:var(--cyan);color:#041011}.radio-close{width:29px!important;padding:0!important;border-color:#364746!important;color:#819693!important;background:#0a1213!important}
+.radio-help{position:absolute;right:0;top:-20px;color:#8ba19e;font-size:6px;letter-spacing:.12em}.radio-help b{color:var(--cyan)}
+#pause{position:fixed;inset:0;z-index:80;background:rgba(2,6,7,.7);backdrop-filter:blur(17px);display:flex;align-items:center;padding-left:11vw;opacity:0;visibility:hidden;transition:.25s}#pause.open{opacity:1;visibility:visible}.pause-card{width:420px}.pause-card .overline{margin-bottom:14px}.pause-card h2{font-size:58px;letter-spacing:-.06em;margin:0 0 30px}.pause-nav{display:flex;flex-direction:column;gap:5px}.pause-nav button{height:48px;text-align:left;padding:0 18px;border:0;border-left:1px solid var(--line);background:linear-gradient(90deg,rgba(13,28,31,.7),transparent);color:#9eb1ae;font-size:8px;letter-spacing:.17em;cursor:pointer}.pause-nav button:hover{border-left:2px solid var(--cyan);color:#fff;background:linear-gradient(90deg,rgba(111,251,240,.12),transparent)}.pause-foot{color:#607572;font-size:6px;letter-spacing:.14em;margin-top:22px}
+.overlay{position:fixed;inset:0;z-index:90;background:rgba(2,6,7,.7);backdrop-filter:blur(15px);display:grid;place-items:center;opacity:0;visibility:hidden;transition:.25s}.overlay.open{opacity:1;visibility:visible}.panel{width:min(760px,calc(100vw - 40px));max-height:calc(100vh - 50px);overflow:auto;border:1px solid var(--line);background:linear-gradient(145deg,rgba(9,20,23,.98),rgba(5,11,13,.98));box-shadow:0 30px 90px rgba(0,0,0,.65)}.panel-head{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 23px;border-bottom:1px solid var(--line)}.panel-head small{display:block;color:var(--cyan);font-size:6px;letter-spacing:.25em}.panel-head h3{font-size:14px;letter-spacing:.15em;margin:5px 0 0}.close-panel{width:34px;height:34px;border:1px solid var(--line);background:transparent;color:#8ba09d;cursor:pointer}.close-panel:hover{color:#fff;border-color:var(--cyan)}.panel-body{padding:24px}.setting{height:63px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(135,245,235,.1)}.setting strong{display:block;font-size:9px;letter-spacing:.1em}.setting small{display:block;font-size:7px;color:#657b78;margin-top:5px}.setting select,.setting input{width:190px;background:#071012;border:1px solid var(--line);color:#c8d9d6;padding:9px 10px;font-size:8px}.setting input[type=range]{accent-color:var(--cyan)}
+.cinematic-lines{position:fixed;inset:0;z-index:3;pointer-events:none;border-top:0 solid #020405;border-bottom:0 solid #020405;transition:.7s}.cinematic-lines.on{border-top-width:7vh;border-bottom-width:7vh}
+#mobileBlock{display:none;position:fixed;inset:0;z-index:300;background:#04090b;padding:35px;place-items:center;text-align:center}.mobile-message .diamond{margin:0 auto 28px}.mobile-message strong{font-size:19px;letter-spacing:.12em}.mobile-message p{font-size:10px;line-height:1.7;color:#849996;max-width:300px}
+@media(max-width:980px){#menu{padding:23px}.menu-main{grid-template-columns:1fr}.city-card{display:none}.hero{padding-left:4vw}.hero h1{font-size:90px}.statuses .chip:first-child{display:none}#radioDash{right:20px;width:390px}.hud-left{display:none}.vehicle-hud{right:16px}.mode-badge{right:16px}}
+@media(max-width:680px){#mobileBlock{display:grid}#loading,#menu,#gameUi,#pause,.overlay{display:none!important}}
 </style>
 </head>
 <body>
-<div id="boot">
-  <div class="boot-inner">
-    <div class="boot-mark"><div class="boot-glyph"></div><div><div class="boot-title">NEON WORLD</div><div style="font-size:7px;color:#607270;letter-spacing:.24em;margin-top:5px">SISTEMA DE EXPLORAÇÃO // 01</div></div></div>
-    <div class="boot-line"><i></i></div>
-    <div class="boot-status"><span>Carregando cidade procedural</span><span>offline</span></div>
-  </div>
-</div>
-<canvas id="scene"></canvas>
-<div class="fx grain"></div><div class="fx scanlines"></div><div class="fx vignette"></div>
+<div id="loading"><div class="loader"><div class="loader-brand"><div class="diamond"></div><div><div class="loader-title">NEON WORLD</div><div class="loader-sub">CIDADE 3D // SISTEMA DE IMERSÃO</div></div></div><div class="loader-track"><i></i></div><div class="loader-meta"><span id="loadText">Construindo Nova Aurora</span><span>WebGL // Offline</span></div></div></div>
+<div id="visualFx"></div><div class="cinematic-lines" id="cinematicLines"></div>
 <main id="menu">
-  <header class="menu-top">
-    <div class="wordmark"><div class="logo-orbit"></div><div><strong>NEON WORLD</strong><small>OPEN WORLD SYSTEM</small></div></div>
-    <div class="top-status"><div class="status-chip"><b>●</b> OFFLINE PRONTO</div><div class="status-chip"><span id="menuClock">23:18</span> <b>22°C</b></div></div>
-  </header>
-  <div class="menu-body">
-    <section class="hero-copy">
-      <div class="eyebrow">São Paulo // Distrito 01</div>
-      <h1 class="title">NEON<span>WORLD</span></h1>
-      <p class="tagline">Uma cidade viva. Nenhum destino imposto. Pegue a estrada, alcance o céu e encontre seu próprio ritmo.</p>
-      <nav class="main-nav">
-        <button class="nav-btn primary" data-action="jogar"><em>01</em><span>JOGAR</span><i>→</i></button>
-        <button class="nav-btn" data-action="continuar"><em>02</em><span>CONTINUAR</span><i>→</i></button>
-        <button class="nav-btn" data-action="garagem"><em>03</em><span>GARAGEM</span><i>→</i></button>
-        <button class="nav-btn" data-action="config"><em>04</em><span>CONFIGURAÇÕES</span><i>→</i></button>
-        <button class="nav-btn" data-action="creditos"><em>05</em><span>CRÉDITOS</span><i>→</i></button>
-        <button class="nav-btn" data-action="sair"><em>06</em><span>SAIR</span><i>→</i></button>
-      </nav>
-    </section>
-    <aside class="destination-preview"><div class="preview-img"><span class="live-dot">AO VIVO</span></div><div class="preview-meta"><div><strong>JARDINS / CENTRO</strong><small>Chuva leve · pista molhada</small></div><b>5,2 KM²</b></div></aside>
-  </div>
-  <footer class="menu-bottom"><div class="bottom-keys"><span><kbd>↑↓</kbd>NAVEGAR</span><span><kbd>ENTER</kbd>SELECIONAR</span></div><div class="build"><span>RENDER <b>PROCEDURAL</b></span><span>BUILD <b>0.9.6 // OFFLINE</b></span></div></footer>
-</main>
-<div class="modal-layer" id="modais">
-  <section class="modal" data-modal="destinos">
-    <header class="modal-head"><div class="modal-title"><small>NOVA JORNADA</small><h2>ESCOLHA UM DESTINO</h2></div><button class="fechar">×</button></header>
-    <div class="modal-body">
-      <div class="city-grid">
-        <button class="city-card selecionada" data-city="São Paulo"><small>BRASIL // 01</small><strong>SÃO PAULO</strong><span>23°33′S · Megalópole tropical</span></button>
-        <button class="city-card" data-city="Rio de Janeiro"><small>BRASIL // 02</small><strong>RIO DE JANEIRO</strong><span>22°54′S · Costa e montanha</span></button>
-        <button class="city-card" data-city="Lisboa"><small>PORTUGAL // 03</small><strong>LISBOA</strong><span>38°43′N · Colinas atlânticas</span></button>
-        <button class="city-card" data-city="Tóquio"><small>JAPÃO // 04</small><strong>TÓQUIO</strong><span>35°41′N · Densidade luminosa</span></button>
-        <button class="city-card" data-city="Nova York"><small>ESTADOS UNIDOS // 05</small><strong>NOVA YORK</strong><span>40°42′N · Cânions urbanos</span></button>
-        <button class="city-card" data-city="Atacama"><small>CHILE // 06</small><strong>ATACAMA</strong><span>23°51′S · Corredor de voo</span></button>
-      </div>
-      <div class="start-row"><div class="mode-select"><button class="mode" data-mode="Realista">REALISTA</button><button class="mode ativo" data-mode="Híbrido">HÍBRIDO</button><button class="mode" data-mode="Estilizado">ESTILIZADO</button></div><button class="cta" id="iniciar">INICIAR EXPLORAÇÃO →</button></div>
-    </div>
-  </section>
-  <section class="modal" data-modal="config">
-    <header class="modal-head"><div class="modal-title"><small>SISTEMA</small><h2>CONFIGURAÇÕES</h2></div><button class="fechar">×</button></header>
-    <div class="modal-body settings-grid">
-      <nav class="settings-tabs"><button class="tab ativo" data-tab="graficos">GRÁFICOS</button><button class="tab" data-tab="audio">ÁUDIO</button><button class="tab" data-tab="controles">CONTROLES</button><button class="tab" data-tab="idioma">IDIOMA</button></nav>
-      <div>
-        <section class="setting-panel ativo" data-panel="graficos">
-          <div class="setting-row"><label><strong>PREDEFINIÇÃO VISUAL</strong><small>Ajusta todos os recursos gráficos</small></label><select id="preset"><option>Frio (notebook)</option><option selected>Equilibrado (padrão)</option><option>Alto</option><option>Cyberpunk (máximo)</option><option>Estilizado (PC fraco)</option></select></div>
-          <div class="setting-row"><label><strong>REFLEXOS AVANÇADOS</strong><small>Disponível no modo Cyberpunk</small></label><button class="toggle" data-setting="reflexos"></button></div>
-          <div class="setting-row"><label><strong>BLOOM SELETIVO</strong><small>Brilho de neon e faróis</small></label><button class="toggle on" data-setting="bloom"></button></div>
-          <div class="setting-row"><label><strong>ESCALA DE RESOLUÇÃO</strong><small>Ajuste dinâmico para manter 60 FPS</small></label><input id="resolution" type="range" min="60" max="100" value="100"></div>
-          <div class="setting-row"><label><strong>LIMITE DE QUADROS</strong><small>Proteção térmica obrigatória</small></label><span style="font-size:9px;color:var(--ciano)">60 FPS</span></div>
-        </section>
-        <section class="setting-panel" data-panel="audio">
-          <div class="setting-row"><label><strong>VOLUME GERAL</strong><small>Saída principal</small></label><input data-volume="master" type="range" min="0" max="100" value="80"></div>
-          <div class="setting-row"><label><strong>EFEITOS</strong><small>Motor, ambiente e interface</small></label><input data-volume="sfx" type="range" min="0" max="100" value="70"></div>
-          <div class="setting-row"><label><strong>RÁDIO</strong><small>Estações locais e fonte externa</small></label><input data-volume="radio" type="range" min="0" max="100" value="55"></div>
-        </section>
-        <section class="setting-panel" data-panel="controles">
-          <div class="setting-row"><label><strong>MOVIMENTO</strong><small>Acelerar, frear e esterçar</small></label><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span></div>
-          <div class="setting-row"><label><strong>ENTRAR / SAIR</strong><small>Interação com o veículo</small></label><kbd>F</kbd></div>
-          <div class="setting-row"><label><strong>TROCAR CÂMERA</strong><small>Distância de acompanhamento</small></label><kbd>C</kbd></div>
-          <div class="setting-row"><label><strong>RÁDIO</strong><small>Ligar ou desligar</small></label><kbd>R</kbd></div>
-          <div class="setting-row"><label><strong>PAUSA</strong><small>Suspende a simulação</small></label><kbd>ESC</kbd></div>
-        </section>
-        <section class="setting-panel" data-panel="idioma"><div class="setting-row"><label><strong>IDIOMA DA INTERFACE</strong><small>Menus, HUD e mensagens</small></label><span style="font-size:9px;color:var(--ciano)">PORTUGUÊS (BRASIL)</span></div><div class="setting-row"><label><strong>LEGENDAS</strong><small>Mensagens ambientais</small></label><button class="toggle on"></button></div></section>
-      </div>
-    </div>
-  </section>
-  <section class="modal" data-modal="garagem">
-    <header class="modal-head"><div class="modal-title"><small>COLEÇÃO // 05 VEÍCULOS</small><h2>GARAGEM</h2></div><button class="fechar">×</button></header>
-    <div class="garage-show">
-      <div class="vehicle-stage"><div class="vehicle-art" id="vehicleArt" data-type="carro"><i class="cabin"></i><i class="body"></i><i class="wheel a"></i><i class="wheel b"></i></div></div>
-      <div class="vehicle-info"><span class="vehicle-index" id="vehicleIndex">URBANO // 01</span><h3 id="vehicleTitle">NOVA GT</h3><p id="vehicleDesc">Cupê elétrico de resposta imediata, aderência equilibrada e nitro regenerativo.</p><div class="stat">VELOCIDADE<i style="--val:82%"></i><b id="s1">82</b></div><div class="stat">CONTROLE<i style="--val:76%"></i><b id="s2">76</b></div><div class="stat">RESISTÊNCIA<i style="--val:58%"></i><b id="s3">58</b></div><div class="vehicle-list"><button class="vehicle-pick ativo" data-vehicle="carro">01</button><button class="vehicle-pick" data-vehicle="moto">02</button><button class="vehicle-pick" data-vehicle="onibus">03</button><button class="vehicle-pick" data-vehicle="aviao">04</button><button class="vehicle-pick" data-vehicle="helicoptero">05</button></div><button class="cta" id="usarVeiculo">DEFINIR COMO VEÍCULO ATIVO</button></div>
-    </div>
-  </section>
-  <section class="modal" data-modal="creditos"><header class="modal-head"><div class="modal-title"><small>SOBRE O PROJETO</small><h2>CRÉDITOS</h2></div><button class="fechar">×</button></header><div class="modal-body"><div class="credits"><div class="big-logo">NEON WORLD</div><p>Conceito e protótipo técnico de uma experiência urbana offline.<br>Renderização procedural, direção arcade, exploração a pé e rádio sintetizada localmente.</p><hr><p>Este protótipo não utiliza marcas, código ou recursos de outros jogos.<br>Poketube.fun é um projeto independente e é aberto somente em uma janela externa.</p><p style="color:var(--ciano);letter-spacing:.2em">BUILD 0.9.6 · PT-BR · 2026</p></div></div></section>
-  <section class="modal" data-modal="sair"><header class="modal-head"><div class="modal-title"><small>ENCERRAR SESSÃO</small><h2>SAIR DO NEON WORLD?</h2></div><button class="fechar">×</button></header><div class="modal-body" style="text-align:center;padding:55px"><p style="font-size:10px;color:#839794;line-height:1.7">O navegador protege esta janela. Seu progresso foi salvo localmente.<br>Você já pode fechar esta aba com segurança.</p><button class="cta fecharDepois" style="margin-top:18px">VOLTAR AO MENU</button></div></section>
-</div>
-<section id="jogo">
-  <canvas id="mundo"></canvas>
-  <div class="hud">
-    <div class="zone-tag"><small>DISTRITO ATUAL</small><strong id="zoneName">SÃO PAULO</strong><i></i></div>
-    <div class="hud-top"><div><span id="gameClock">23:18</span><b id="gamePeriod">NOITE</b></div><div><span>☂</span><b id="weather">CHUVA LEVE</b></div><div><span>OBJ</span><b>EXPLORAÇÃO LIVRE</b></div></div>
-    <div class="radio-widget" id="radioWidget"><div class="radio-main" id="radioExpand"><div class="album"></div><div class="track"><small id="stationName">NEON FM // 88.4</small><strong id="trackName">Pulso da Madrugada</strong><span id="artistName">Transmissão procedural local</span></div><div class="radio-state">⌁</div></div><div class="radio-drawer"><div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="radio-controls"><button id="prevStation">‹</button><button class="power" id="radioPower">LIGAR</button><button id="nextStation">›</button></div><div class="radio-source"><button id="pokeButton">ABRIR POKETUBE.FUN ↗</button></div></div></div>
-    <div class="minimap-box"><canvas id="minimapa" width="320" height="320"></canvas><b class="mini-n">N</b><div class="mini-meta"><b>◈</b><span id="streetName">AV. NEON</span></div></div>
-    <div class="speed-box"><div class="speed-num"><span id="speed">000</span><small id="speedUnit">KM/H</small></div><div class="vehicle-name" id="hudVehicle">NOVA GT // MODO RUA</div><div class="meters"><div class="meter"><label><span>COMB.</span><b id="fuelText">94%</b></label><i><b id="fuelBar" style="--v:94%"></b></i></div><div class="meter"><label><span>INTEGR.</span><b>100%</b></label><i><b style="--v:100%"></b></i></div></div></div>
-    <div class="prompt" id="prompt"><kbd>F</kbd><span id="promptText">PRESSIONE PARA SAIR DO VEÍCULO</span></div>
-    <div class="control-tip">WASD DIRIGIR&nbsp;&nbsp;·&nbsp;&nbsp; SHIFT NITRO&nbsp;&nbsp;·&nbsp;&nbsp; F ENTRAR / SAIR&nbsp;&nbsp;·&nbsp;&nbsp; C CÂMERA&nbsp;&nbsp;·&nbsp;&nbsp; R RÁDIO&nbsp;&nbsp;·&nbsp;&nbsp; ESC PAUSA</div>
-    <div class="crosshair"></div><div class="toast" id="toast"></div>
-  </div>
+<header class="topbar"><div class="brand"><div class="diamond"></div><div><strong>NEON WORLD</strong><small>FIRST PERSON CITY</small></div></div><div class="statuses"><div class="chip"><i></i> CIDADE CARREGADA</div><div class="chip"><span id="menuTime">22:47</span><b>18°C</b></div></div></header>
+<section class="menu-main">
+<div class="hero"><div class="overline">Nova Aurora // Distrito Central</div><h1>NEON<span>WORLD</span></h1><p class="hero-copy">Uma cidade. Infinitas noites. <b>Assuma o volante em primeira pessoa</b>, abandone o carro quando quiser e descubra cada avenida sob a chuva.</p><div class="menu-actions"><button class="primary" id="playButton">ENTRAR NA CIDADE →</button><button class="secondary" id="continueButton">CONTINUAR</button><button class="secondary" id="settingsButton">AJUSTES</button></div><div class="continue-note"><i></i><span>PROGRESSO SALVO LOCALMENTE · SEM CONTA · SEM SERVIDOR</span></div></div>
+<aside class="city-card"><div class="city-visual"><div class="city-live">SIMULAÇÃO ATIVA</div><div class="city-mark"><small>ÚNICA CIDADE // BRASIL</small><strong>NOVA AURORA</strong><span>Centro, orla e distrito financeiro</span></div></div><div class="city-data"><div><small>ÁREA EXPLORÁVEL</small><b>6,4 KM²</b></div><div><small>CLIMA</small><b>CHUVA LEVE</b></div><div><small>HORÁRIO</small><b>22:47</b></div></div></aside>
 </section>
-<section id="pause"><div class="pause-panel"><div class="eyebrow">Simulação suspensa</div><h2>PAUSA</h2><nav class="pause-nav"><button data-pause="continuar">CONTINUAR</button><button data-pause="salvar">SALVAR JOGO</button><button data-pause="garagem">GARAGEM</button><button data-pause="config">CONFIGURAÇÕES</button><button data-pause="menu">VOLTAR AO MENU PRINCIPAL</button></nav><div class="pause-save" id="saveStatus">SALVAMENTO LOCAL ATIVO // INDEXEDDB</div></div></section>
-<script>
-(()=>{
-"use strict";
-const $=(s,p=document)=>p.querySelector(s),$$=(s,p=document)=>[...p.querySelectorAll(s)];
-const scene=$("#scene"),sctx=scene.getContext("2d"),world=$("#mundo"),ctx=world.getContext("2d"),mini=$("#minimapa"),mctx=mini.getContext("2d");
-const menu=$("#menu"),game=$("#jogo"),modalLayer=$("#modais"),pause=$("#pause");
-let sw=innerWidth,sh=innerHeight,lastScene=0,lastFrame=0,paused=false,running=false,selectedCity="São Paulo",mapMode="Híbrido",selectedVehicle="carro",cameraMode=1,renderScale=1,avgFrame=12,toastTimer=0;
-const keys=new Set();
-const settings={preset:"Equilibrado (padrão)",bloom:true,reflexos:false,resolution:100,master:.8,sfx:.7,radio:.55};
-const vehicles={
-carro:{name:"NOVA GT",group:"URBANO // 01",desc:"Cupê elétrico de resposta imediata, aderência equilibrada e nitro regenerativo.",stats:[82,76,58],max:270,accel:150,turn:2.35,size:[38,19],unit:"KM/H"},
-moto:{name:"VÉRTICE R",group:"MOTO // 02",desc:"Motocicleta leve de alta rotação, inclinação agressiva e controle preciso.",stats:[91,64,32],max:315,accel:185,turn:2.8,size:[27,10],unit:"KM/H"},
-onibus:{name:"METRO L-12",group:"TRANSPORTE // 03",desc:"Ônibus urbano elétrico, pesado e estável, criado para as grandes avenidas.",stats:[44,41,94],max:130,accel:65,turn:1.15,size:[55,22],unit:"KM/H"},
-aviao:{name:"AURORA 6",group:"AERONAVE // 04",desc:"Jato executivo ágil com superfícies de controle responsivas e grande alcance.",stats:[98,58,51],max:520,accel:95,turn:1.15,size:[52,48],unit:"KT"},
-helicoptero:{name:"NIMBUS HX",group:"ROTOR // 05",desc:"Helicóptero utilitário versátil com controle coletivo e excelente visibilidade.",stats:[72,84,63],max:240,accel:105,turn:1.7,size:[47,38],unit:"KT"}
-};
-const stations=[
-{name:"NEON FM // 88.4",track:"Pulso da Madrugada",artist:"Transmissão procedural local",freq:[55,82.41,110]},
-{name:"SYNTHWAVE // 91.7",track:"Horizonte Magnético",artist:"Sinal offline gerado",freq:[65.41,98,130.81]},
-{name:"LO-FI // 95.2",track:"Chuva na Paulista",artist:"Texturas urbanas locais",freq:[49,73.42,98]},
-{name:"ELETRÔNICA // 102.9",track:"Concreto Líquido",artist:"Sequência procedural",freq:[73.42,110,146.83]},
-{name:"CLÁSSICA // 106.1",track:"Noturno para uma Cidade",artist:"Transmissão instrumental",freq:[65.41,82.41,123.47]}
-];
-const cityPalette={"São Paulo":["#62f7f0","#ff3fae"],"Rio de Janeiro":["#4dffbf","#ffb34e"],"Lisboa":["#70bfff","#ffcf70"],"Tóquio":["#ff4fa8","#7b8cff"],"Nova York":["#6de7ff","#ff6d55"],"Atacama":["#ff9d55","#7ee8ff"]};
-const state={x:80,y:80,angle:-.4,speed:0,fuel:94,altitude:0,onFoot:false,vehicle:"carro",station:0,radio:false,time:23.3,weather:"CHUVA LEVE"};
-const npcs=Array.from({length:28},(_,i)=>({axis:i%2,x:(i%7-3)*480+(i%3)*34,y:(Math.floor(i/7)-2)*480+((i*71)%250),dir:i%4<2?1:-1,speed:45+(i*17)%55,color:i%3===0?"#ff4fa8":"#5edbd6"}));
-let db=null,audio=null,radioNodes=null;
-function resize(){sw=innerWidth;sh=innerHeight;scene.width=Math.round(sw*Math.min(devicePixelRatio,1.5));scene.height=Math.round(sh*Math.min(devicePixelRatio,1.5));scene.style.width=sw+"px";scene.style.height=sh+"px";world.width=Math.max(1,Math.round(sw*Math.min(devicePixelRatio,1.5)*renderScale));world.height=Math.max(1,Math.round(sh*Math.min(devicePixelRatio,1.5)*renderScale));world.style.width=sw+"px";world.style.height=sh+"px"}
-function hash(n){return Math.abs(Math.sin(n*127.1+311.7)*43758.5453)%1}
-function drawScene(t){if(document.hidden)return;requestAnimationFrame(drawScene);if(t-lastScene<33)return;lastScene=t;const d=scene.width/sw;sctx.setTransform(d,0,0,d,0,0);const time=t*.00008;let g=sctx.createLinearGradient(0,0,0,sh);g.addColorStop(0,"#071015");g.addColorStop(.45,"#111928");g.addColorStop(1,"#04090b");sctx.fillStyle=g;sctx.fillRect(0,0,sw,sh);const glow=sctx.createRadialGradient(sw*.72,sh*.25,4,sw*.72,sh*.25,sh*.42);glow.addColorStop(0,"rgba(82,199,211,.22)");glow.addColorStop(1,"rgba(5,8,10,0)");sctx.fillStyle=glow;sctx.fillRect(0,0,sw,sh);sctx.fillStyle="rgba(210,255,252,.85)";sctx.beginPath();sctx.arc(sw*.79,sh*.16,22,0,Math.PI*2);sctx.fill();sctx.fillStyle="#091116";sctx.beginPath();sctx.arc(sw*.79-8,sh*.16-4,21,0,Math.PI*2);sctx.fill();for(let layer=0;layer<3;layer++){const base=sh*(.45+layer*.09),step=35+layer*24;sctx.fillStyle=["#0a171c","#081216","#050b0d"][layer];for(let i=-2;i<sw/step+3;i++){const x=i*step-((time*(8+layer*5))%step),h=50+hash(i+layer*99)*sh*(.2+layer*.08),w=step+2;sctx.fillRect(x,base-h,w,h+sh-base);if(layer>0){sctx.fillStyle=layer===2?"rgba(77,231,220,.2)":"rgba(255,69,166,.1)";for(let j=0;j<8;j++)if(hash(i*71+j*13)>.35)sctx.fillRect(x+7+hash(i*31+j)*Math.max(3,w-14),base-h+12+hash(i*53+j*7)*Math.max(3,h-24),2,4);sctx.fillStyle=["#0a171c","#081216","#050b0d"][layer]}}}const horizon=sh*.67;sctx.fillStyle="#050a0b";sctx.fillRect(0,horizon,sw,sh-horizon);for(let i=0;i<18;i++){const p=(i/18+(time*.06))%1,y=horizon+Math.pow(p,1.5)*(sh-horizon),half=20+p*sw*.56;sctx.strokeStyle=i%3===0?"rgba(98,247,240,.22)":"rgba(95,130,130,.08)";sctx.beginPath();sctx.moveTo(sw*.65-half,y);sctx.lineTo(sw*.65+half,y);sctx.stroke()}for(let side of[-1,1]){sctx.strokeStyle=side<0?"rgba(255,63,174,.35)":"rgba(98,247,240,.35)";sctx.lineWidth=2;sctx.beginPath();sctx.moveTo(sw*.65+side*40,horizon);sctx.lineTo(sw*.65+side*sw*.45,sh);sctx.stroke()}for(let i=0;i<75;i++){const x=(hash(i*11+t*.00002)*sw),y=(hash(i*23+t*.00012)*sh),len=10+hash(i)*28;sctx.strokeStyle=i%6===0?"rgba(255,74,174,.35)":"rgba(130,235,230,.2)";sctx.beginPath();sctx.moveTo(x,y);sctx.lineTo(x-4,y+len);sctx.stroke()}}
-function openModal(name){modalLayer.classList.add("aberto");$$('.modal',modalLayer).forEach(m=>m.classList.toggle("ativo",m.dataset.modal===name))}
-function closeModal(){modalLayer.classList.remove("aberto");$$('.modal',modalLayer).forEach(m=>m.classList.remove("ativo"))}
-function showToast(text){const el=$("#toast");el.textContent=text;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2200)}
-function updateGarage(type){selectedVehicle=type;const v=vehicles[type],art=$("#vehicleArt");art.dataset.type=type;$("#vehicleIndex").textContent=v.group;$("#vehicleTitle").textContent=v.name;$("#vehicleDesc").textContent=v.desc;["#s1","#s2","#s3"].forEach((s,i)=>{$(s).textContent=v.stats[i];$(s).previousElementSibling.style.setProperty("--val",v.stats[i]+"%")});$$('.vehicle-pick').forEach(b=>b.classList.toggle("ativo",b.dataset.vehicle===type))}
-function applyPreset(){const p=$("#preset").value;settings.preset=p;settings.reflexos=p.includes("Cyberpunk");settings.bloom=!p.includes("Frio");renderScale=p.includes("Frio")?.72:p.includes("Cyberpunk")?1:Math.min(1,settings.resolution/100);$$('[data-setting="reflexos"]').forEach(x=>x.classList.toggle("on",settings.reflexos));$$('[data-setting="bloom"]').forEach(x=>x.classList.toggle("on",settings.bloom));document.documentElement.style.setProperty("--scan",p.includes("Estilizado")?".14":".08");resize();localStorage.setItem("neon-settings",JSON.stringify(settings))}
-function updateTheme(){const p=cityPalette[selectedCity]||cityPalette["São Paulo"];document.documentElement.style.setProperty("--ciano",p[0]);document.documentElement.style.setProperty("--magenta",p[1])}
-function enterGame(saved){closeModal();if(saved){Object.assign(state,saved);state.radio=false}else{state.x=80;state.y=80;state.speed=0;state.fuel=94;state.altitude=0;state.onFoot=false;state.vehicle=selectedVehicle;state.time=selectedCity==="Tóquio"?20.6:23.3}selectedVehicle=state.vehicle;radioUpdate();updateTheme();$("#zoneName").textContent=selectedCity.toUpperCase();menu.classList.add("oculto");game.classList.add("ativo");running=true;paused=false;pause.classList.remove("ativo");lastFrame=performance.now();updateHUD();showToast("MUNDO OFFLINE CARREGADO // "+selectedCity.toUpperCase());setTimeout(()=>saveGame(false),1200)}
-function leaveGame(){running=false;paused=false;state.radio=false;if(radioNodes)radioNodes.master.gain.setTargetAtTime(0,audio.currentTime,.08);radioUpdate();game.classList.remove("ativo");pause.classList.remove("ativo");menu.classList.remove("oculto");saveGame(false)}
-function openDB(){return new Promise(resolve=>{if(!indexedDB){resolve(null);return}const req=indexedDB.open("neon-world",1);req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains("saves"))req.result.createObjectStore("saves")};req.onsuccess=()=>{db=req.result;resolve(db)};req.onerror=()=>resolve(null)})}
-async function saveGame(notify=true){const data={...state,city:selectedCity,mode:mapMode,vehicle:state.vehicle,savedAt:Date.now()};localStorage.setItem("neon-save-fallback",JSON.stringify(data));if(db){await new Promise(resolve=>{const tx=db.transaction("saves","readwrite");tx.objectStore("saves").put(data,"principal");tx.oncomplete=resolve;tx.onerror=resolve})}if(notify){showToast("JOGO SALVO LOCALMENTE");$("#saveStatus").textContent="SALVO AGORA // INDEXEDDB"}}
-async function loadGame(){let data=null;if(db)data=await new Promise(resolve=>{const req=db.transaction("saves").objectStore("saves").get("principal");req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>resolve(null)});if(!data){try{data=JSON.parse(localStorage.getItem("neon-save-fallback"))}catch(e){data=null}}if(data){selectedCity=data.city||"São Paulo";mapMode=data.mode||"Híbrido";enterGame(data)}else openModal("destinos")}
-function roadInfo(x,y){const block=480,rx=((x+block/2)%block+block)%block-block/2,ry=((y+block/2)%block+block)%block-block/2;return Math.abs(rx)<64||Math.abs(ry)<64}
-function update(dt){if(paused)return;state.time=(state.time+dt*.018)%24;const v=vehicles[state.vehicle];let boost=keys.has("ShiftLeft")||keys.has("ShiftRight");if(state.onFoot){let dx=(keys.has("KeyD")||keys.has("ArrowRight")?1:0)-(keys.has("KeyA")||keys.has("ArrowLeft")?1:0),dy=(keys.has("KeyS")||keys.has("ArrowDown")?1:0)-(keys.has("KeyW")||keys.has("ArrowUp")?1:0),len=Math.hypot(dx,dy)||1,speed=boost?155:92;state.x+=dx/len*speed*dt;state.y+=dy/len*speed*dt;if(dx||dy)state.angle=Math.atan2(dy,dx);state.speed=Math.hypot(dx,dy)*speed/4}else{let throttle=(keys.has("KeyW")||keys.has("ArrowUp")?1:0)-(keys.has("KeyS")||keys.has("ArrowDown")?1:0),steer=(keys.has("KeyD")||keys.has("ArrowRight")?1:0)-(keys.has("KeyA")||keys.has("ArrowLeft")?1:0),max=v.max*(boost?1.16:1),road=roadInfo(state.x,state.y)||state.vehicle==="aviao"||state.vehicle==="helicoptero";if(throttle)state.speed+=throttle*v.accel*dt;else state.speed*=Math.pow(.975,dt*60);if(!road)state.speed*=Math.pow(.986,dt*60);state.speed=Math.max(-max*.28,Math.min(max,state.speed));const steerScale=Math.min(1,Math.abs(state.speed)/40+.12);state.angle+=steer*v.turn*steerScale*dt*(state.speed>=0?1:-1);state.x+=Math.cos(state.angle)*state.speed*dt*.55;state.y+=Math.sin(state.angle)*state.speed*dt*.55;if((state.vehicle==="helicoptero"||state.vehicle==="aviao")){let lift=(keys.has("KeyR")?1:0)-(keys.has("KeyF")?1:0);if(state.vehicle==="aviao"&&state.speed>120)state.altitude+=Math.max(0,(state.speed-120)*.002)*dt*60;state.altitude=Math.max(0,Math.min(1800,state.altitude+lift*110*dt));if(state.vehicle==="aviao"&&state.speed<70)state.altitude=Math.max(0,state.altitude-28*dt)}else state.altitude=0;if(Math.abs(state.speed)>3)state.fuel=Math.max(0,state.fuel-dt*(boost?.06:.018));if(state.fuel<=0)state.speed*=.96}for(const n of npcs){if(n.axis===0)n.x+=n.speed*n.dir*dt;else n.y+=n.speed*n.dir*dt;if(n.x>3000)n.x=-3000;if(n.x<-3000)n.x=3000;if(n.y>3000)n.y=-3000;if(n.y<-3000)n.y=3000}}
-function drawRoads(cam,zoom){const block=480,rangeX=Math.ceil(sw/zoom/block/2)+1,rangeY=Math.ceil(sh/zoom/block/2)+1,cx=Math.floor(cam.x/block),cy=Math.floor(cam.y/block);ctx.fillStyle=mapMode==="Estilizado"?"#081416":"#101719";ctx.fillRect(cam.x-sw/zoom,cam.y-sh/zoom,sw*2/zoom,sh*2/zoom);for(let ix=cx-rangeX;ix<=cx+rangeX;ix++)for(let iy=cy-rangeY;iy<=cy+rangeY;iy++){const x=ix*block,y=iy*block;ctx.fillStyle=mapMode==="Realista"?"#1b2222":"#111c1e";ctx.fillRect(x-64,y-block/2,128,block);ctx.fillRect(x-block/2,y-64,block,128);ctx.strokeStyle="rgba(212,221,202,.19)";ctx.lineWidth=1;ctx.setLineDash([18,22]);ctx.beginPath();ctx.moveTo(x,y-block/2);ctx.lineTo(x,y+block/2);ctx.moveTo(x-block/2,y);ctx.lineTo(x+block/2,y);ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle="rgba(98,247,240,.1)";ctx.strokeRect(x-63,y-block/2,126,block);ctx.strokeRect(x-block/2,y-63,block,126);for(let z=-48;z<=48;z+=12){ctx.fillStyle="rgba(225,235,225,.16)";ctx.fillRect(x+z-4,y-82,7,22);ctx.fillRect(x+z-4,y+60,7,22);ctx.fillRect(x-82,y+z-4,22,7);ctx.fillRect(x+60,y+z-4,22,7)}drawBlock(ix,iy,x+68,y+68,block-136)}}
-function drawBlock(ix,iy,x,y,size){const park=hash(ix*29+iy*53)>.84;if(park){ctx.fillStyle="#102822";ctx.fillRect(x,y,size,size);ctx.strokeStyle="rgba(84,217,164,.18)";ctx.strokeRect(x,y,size,size);for(let i=0;i<13;i++){const tx=x+18+hash(i+ix*9)*size*.85,ty=y+18+hash(i+iy*7)*size*.85;ctx.fillStyle="#1f5c49";ctx.beginPath();ctx.arc(tx,ty,5+hash(i*3)*7,0,Math.PI*2);ctx.fill();ctx.fillStyle="rgba(98,247,240,.3)";ctx.fillRect(tx-1,ty-1,2,2)}return}ctx.fillStyle="#151e1f";ctx.fillRect(x,y,size,size);ctx.strokeStyle="rgba(139,177,172,.12)";ctx.strokeRect(x,y,size,size);const count=2+Math.floor(hash(ix*91+iy*77)*3);for(let i=0;i<count;i++){const cols=count>3?2:count,w=cols===2?(size-30)/2:size-24,h=count>2?(size-30)/2:size-24,bx=x+10+(i%cols)*(w+10),by=y+10+Math.floor(i/cols)*(h+10),height=18+hash(ix*31+iy*17+i)*58,off=height*.18;ctx.fillStyle="rgba(0,0,0,.45)";ctx.fillRect(bx+9,by+12,w,h);ctx.fillStyle=mapMode==="Estilizado"?"#102c31":"#1d2c2e";ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx+w,by);ctx.lineTo(bx+w,by+h);ctx.lineTo(bx,by+h);ctx.closePath();ctx.fill();ctx.fillStyle="#0b171a";ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx+off,by-off);ctx.lineTo(bx+w+off,by-off);ctx.lineTo(bx+w,by);ctx.closePath();ctx.fill();ctx.strokeStyle=i%3===0?"rgba(255,63,174,.35)":"rgba(98,247,240,.25)";ctx.strokeRect(bx,by,w,h);ctx.fillStyle=i%3===0?"rgba(255,63,174,.35)":"rgba(98,247,240,.3)";for(let j=0;j<20;j++){const wx=bx+7+hash(ix*1901+iy*313+i*47+j)*Math.max(2,w-14),wy=by+7+hash(ix*827+iy*1619+i*83+j*3)*Math.max(2,h-14);if(hash(j*31+ix*7+iy)>.25)ctx.fillRect(wx,wy,3,4)}}}
-function drawVehicle(x,y,a,type,color="#62f7f0",player=true){const v=vehicles[type],w=v.size[0],h=v.size[1];ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.shadowBlur=player&&settings.bloom?18:4;ctx.shadowColor=color;if(type==="aviao"){ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(w*.58,0);ctx.lineTo(-w*.4,-h*.14);ctx.lineTo(-w*.25,-h*.5);ctx.lineTo(-w*.52,-h*.46);ctx.lineTo(-w*.47,-h*.09);ctx.lineTo(-w*.58,0);ctx.lineTo(-w*.47,h*.09);ctx.lineTo(-w*.52,h*.46);ctx.lineTo(-w*.25,h*.5);ctx.lineTo(-w*.4,h*.14);ctx.closePath();ctx.fill()}else if(type==="helicoptero"){ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(4,0,w*.34,h*.3,0,0,Math.PI*2);ctx.fill();ctx.fillRect(-w*.55,-2,w*.48,4);ctx.strokeStyle="rgba(220,255,252,.75)";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-w*.45,0);ctx.lineTo(w*.5,0);ctx.stroke();ctx.beginPath();ctx.moveTo(0,-h*.48);ctx.lineTo(0,h*.48);ctx.stroke()}else{ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(-w/2,-h/2,w,h,type==="moto"?5:7);ctx.fill();ctx.fillStyle="#071114";if(type==="moto")ctx.fillRect(-5,-h*.45,13,h*.9);else{ctx.beginPath();ctx.roundRect(-w*.14,-h*.4,w*.31,h*.8,4);ctx.fill()}ctx.fillStyle="#eafffc";ctx.fillRect(w*.34,-h*.33,3,h*.2);ctx.fillRect(w*.34,h*.13,3,h*.2)}if(player){ctx.strokeStyle="#eafffc";ctx.lineWidth=1;ctx.stroke()}ctx.restore()}
-function drawPlayer(){ctx.save();ctx.translate(state.x,state.y);ctx.rotate(state.angle);ctx.shadowBlur=12;ctx.shadowColor="#62f7f0";ctx.fillStyle="#d9ff63";ctx.beginPath();ctx.arc(0,0,6,0,Math.PI*2);ctx.fill();ctx.strokeStyle="#eafffc";ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(10,0);ctx.stroke();ctx.restore()}
-function drawWorld(){const d=world.width/sw;ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,sw,sh);const v=vehicles[state.vehicle],z=[.68,.9,1.16][cameraMode],altZoom=state.altitude>0?Math.max(.28,z-state.altitude/2500):z,cam={x:state.x+Math.cos(state.angle)*Math.max(0,state.speed)*.22,y:state.y+Math.sin(state.angle)*Math.max(0,state.speed)*.22};ctx.save();ctx.translate(sw/2,sh/2);ctx.scale(altZoom,altZoom);ctx.translate(-cam.x,-cam.y);drawRoads(cam,altZoom);for(const n of npcs)drawVehicle(n.x,n.y,n.axis===0?(n.dir>0?0:Math.PI):(n.dir>0?Math.PI/2:-Math.PI/2),n.axis===0?"carro":"moto",n.color,false);if(state.onFoot){drawVehicle(state.x+40,state.y+24,state.angle,state.vehicle,"#43d9d6",true);drawPlayer()}else drawVehicle(state.x,state.y,state.angle,state.vehicle,"#55eee7",true);ctx.restore();if(state.weather.includes("CHUVA")){ctx.strokeStyle="rgba(150,235,231,.18)";ctx.lineWidth=1;for(let i=0;i<90;i++){const x=(hash(i*17+performance.now()*.0003)*sw),y=(hash(i*29+performance.now()*.0008)*sh);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-5,y+18);ctx.stroke()}}if(settings.bloom){const vg=ctx.createRadialGradient(sw/2,sh/2,sh*.2,sw/2,sh/2,sh*.8);vg.addColorStop(0,"rgba(0,0,0,0)");vg.addColorStop(1,"rgba(0,5,7,.58)");ctx.fillStyle=vg;ctx.fillRect(0,0,sw,sh)}drawMinimap();updateHUD()}
-function drawMinimap(){const w=mini.width,h=mini.height,scale=.24;mctx.setTransform(1,0,0,1,0,0);mctx.fillStyle="#081315";mctx.fillRect(0,0,w,h);mctx.save();mctx.translate(w/2,h/2);mctx.rotate(-state.angle-Math.PI/2);mctx.translate(-state.x*scale,-state.y*scale);const block=480;for(let ix=Math.floor(state.x/block)-3;ix<=Math.floor(state.x/block)+3;ix++)for(let iy=Math.floor(state.y/block)-3;iy<=Math.floor(state.y/block)+3;iy++){const x=ix*block*scale,y=iy*block*scale;mctx.strokeStyle="#294043";mctx.lineWidth=30;mctx.beginPath();mctx.moveTo(x,y-block*scale/2);mctx.lineTo(x,y+block*scale/2);mctx.moveTo(x-block*scale/2,y);mctx.lineTo(x+block*scale/2,y);mctx.stroke();mctx.strokeStyle="rgba(98,247,240,.25)";mctx.lineWidth=1;mctx.stroke()}mctx.restore();mctx.fillStyle="#d9ff63";mctx.beginPath();mctx.moveTo(w/2,h/2-9);mctx.lineTo(w/2-6,h/2+7);mctx.lineTo(w/2+6,h/2+7);mctx.closePath();mctx.fill();mctx.strokeStyle="rgba(98,247,240,.8)";mctx.beginPath();mctx.arc(w/2,h/2,22,0,Math.PI*2);mctx.stroke()}
-function updateHUD(){const v=vehicles[state.vehicle],displaySpeed=Math.round(Math.abs(state.speed)*(v.unit==="KT"?.54:1));$("#speed").textContent=String(displaySpeed).padStart(3,"0");$("#speedUnit").textContent=state.onFoot?"A PÉ":v.unit;$("#hudVehicle").textContent=state.onFoot?"EXPLORAÇÃO A PÉ // LIVRE":v.name+" // "+(state.altitude>2?Math.round(state.altitude)+" M":"MODO RUA");$("#fuelText").textContent=Math.round(state.fuel)+"%";$("#fuelBar").style.setProperty("--v",state.fuel+"%");const hh=Math.floor(state.time),mm=Math.floor((state.time-hh)*60);$("#gameClock").textContent=String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0");$("#gamePeriod").textContent=hh>5&&hh<12?"MANHÃ":hh<18?"TARDE":"NOITE";$("#promptText").textContent=state.onFoot?"PRESSIONE PARA ENTRAR NO VEÍCULO":"PRESSIONE PARA SAIR DO VEÍCULO";$("#prompt").classList.toggle("visivel",state.onFoot||Math.abs(state.speed)<6);const streets=["AV. NEON","RUA HORIZONTE","EIXO CENTRAL","ALAMEDA PULSO","VIA LUMINOSA"];$("#streetName").textContent=streets[Math.abs(Math.floor(state.x/480)+Math.floor(state.y/480))%streets.length];$(".control-tip").textContent=state.vehicle==="aviao"||state.vehicle==="helicoptero"?"W/S POTÊNCIA  ·  A/D DIREÇÃO  ·  R/F ALTITUDE  ·  C CÂMERA  ·  T RÁDIO  ·  ESC PAUSA":"WASD DIRIGIR  ·  SHIFT NITRO  ·  F ENTRAR / SAIR  ·  C CÂMERA  ·  R RÁDIO  ·  ESC PAUSA"}
-function frame(t){requestAnimationFrame(frame);if(!running||paused||document.hidden)return;const elapsed=t-lastFrame,step=1000/60;if(elapsed<step-.5)return;lastFrame=t-elapsed%step;const dt=Math.min(.033,elapsed/1000);avgFrame=avgFrame*.96+elapsed*.04;if(avgFrame>21&&renderScale>.65){renderScale=Math.max(.65,renderScale-.05);resize();avgFrame=14}else if(avgFrame<14&&renderScale<Math.min(1,settings.resolution/100)){renderScale=Math.min(settings.resolution/100,renderScale+.02);resize();avgFrame=16}update(dt);drawWorld()}
-function togglePause(value=!paused){if(!running)return;paused=value;pause.classList.toggle("ativo",paused);if(paused)saveGame(false);else lastFrame=performance.now()}
-function toggleVehicle(){if(!state.onFoot&&Math.abs(state.speed)>12){showToast("REDUZA A VELOCIDADE PARA SAIR");return}state.onFoot=!state.onFoot;state.speed=0;showToast(state.onFoot?"MODO A PÉ ATIVADO":"VEÍCULO ATIVO // "+vehicles[state.vehicle].name)}
-function radioUpdate(){const s=stations[state.station];$("#stationName").textContent=s.name;$("#trackName").textContent=s.track;$("#artistName").textContent=s.artist;$("#radioWidget").classList.toggle("tocando",state.radio);$("#radioPower").textContent=state.radio?"PAUSAR":"LIGAR";if(radioNodes)s.freq.forEach((f,i)=>radioNodes.osc[i].frequency.setTargetAtTime(f,audio.currentTime,.25))}
-function startAudio(){if(!audio)audio=new(window.AudioContext||window.webkitAudioContext)();if(audio.state==="suspended")audio.resume();if(!radioNodes){const master=audio.createGain(),filter=audio.createBiquadFilter(),lfo=audio.createOscillator(),lfoGain=audio.createGain(),osc=[];master.gain.value=0;filter.type="lowpass";filter.frequency.value=700;lfo.frequency.value=.12;lfoGain.gain.value=90;lfo.connect(lfoGain);lfoGain.connect(filter.frequency);lfo.start();for(let i=0;i<3;i++){const o=audio.createOscillator(),g=audio.createGain();o.type=i===0?"sine":i===1?"triangle":"sine";o.frequency.value=stations[state.station].freq[i];g.gain.value=[.12,.035,.018][i];o.connect(g);g.connect(filter);o.start();osc.push(o)}filter.connect(master);master.connect(audio.destination);radioNodes={master,osc};}radioNodes.master.gain.setTargetAtTime(state.radio?settings.radio*.22:0,audio.currentTime,.12)}
-function toggleRadio(){state.radio=!state.radio;startAudio();radioUpdate();showToast(state.radio?"RÁDIO LIGADO // "+stations[state.station].name:"RÁDIO DESLIGADO")}
-function changeStation(dir){state.station=(state.station+dir+stations.length)%stations.length;radioUpdate();if(state.radio)startAudio()}
-$$('[data-action]').forEach(b=>b.addEventListener("click",()=>{const a=b.dataset.action;if(a==="jogar")openModal("destinos");if(a==="continuar")loadGame();if(a==="garagem")openModal("garagem");if(a==="config")openModal("config");if(a==="creditos")openModal("creditos");if(a==="sair"){saveGame(false);openModal("sair")}}));
-$$('.fechar,.fecharDepois').forEach(b=>b.addEventListener("click",closeModal));
-modalLayer.addEventListener("click",e=>{if(e.target===modalLayer)closeModal()});
-$$('.city-card').forEach(b=>b.addEventListener("click",()=>{$$('.city-card').forEach(x=>x.classList.remove("selecionada"));b.classList.add("selecionada");selectedCity=b.dataset.city;updateTheme()}));
-$$('.mode').forEach(b=>b.addEventListener("click",()=>{$$('.mode').forEach(x=>x.classList.remove("ativo"));b.classList.add("ativo");mapMode=b.dataset.mode}));
-$("#iniciar").addEventListener("click",()=>enterGame(null));
-$$('.tab').forEach(b=>b.addEventListener("click",()=>{$$('.tab').forEach(x=>x.classList.toggle("ativo",x===b));$$('.setting-panel').forEach(x=>x.classList.toggle("ativo",x.dataset.panel===b.dataset.tab))}));
-$$('.toggle').forEach(b=>b.addEventListener("click",()=>{b.classList.toggle("on");if(b.dataset.setting)settings[b.dataset.setting]=b.classList.contains("on");localStorage.setItem("neon-settings",JSON.stringify(settings))}));
-$("#preset").addEventListener("change",applyPreset);$("#resolution").addEventListener("input",e=>{settings.resolution=+e.target.value;renderScale=Math.min(renderScale,settings.resolution/100);resize()});
-$$('[data-volume]').forEach(x=>x.addEventListener("input",()=>{settings[x.dataset.volume]=+x.value/100;if(x.dataset.volume==="radio"&&radioNodes)radioNodes.master.gain.setTargetAtTime(state.radio?settings.radio*.22:0,audio.currentTime,.1)}));
-$$('.vehicle-pick').forEach(b=>b.addEventListener("click",()=>updateGarage(b.dataset.vehicle)));
-$("#usarVeiculo").addEventListener("click",()=>{state.vehicle=selectedVehicle;state.speed=0;state.altitude=0;closeModal();if(running){togglePause(false);showToast("VEÍCULO ATIVO // "+vehicles[selectedVehicle].name)}});
-$$('[data-pause]').forEach(b=>b.addEventListener("click",()=>{const a=b.dataset.pause;if(a==="continuar")togglePause(false);if(a==="salvar")saveGame(true);if(a==="garagem")openModal("garagem");if(a==="config")openModal("config");if(a==="menu")leaveGame()}));
-$("#radioExpand").addEventListener("click",()=>$("#radioWidget").classList.toggle("expandido"));$("#radioPower").addEventListener("click",toggleRadio);$("#prevStation").addEventListener("click",()=>changeStation(-1));$("#nextStation").addEventListener("click",()=>changeStation(1));$("#pokeButton").addEventListener("click",()=>window.open("https://poketube.fun","neon-poketube","popup,width=520,height=760"));
-addEventListener("keydown",e=>{if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(e.code))e.preventDefault();if(!e.repeat){if(e.code==="Escape"){if(modalLayer.classList.contains("aberto"))closeModal();else if(running)togglePause()}if(running&&!paused&&e.code==="KeyF"&&!(state.vehicle==="aviao"||state.vehicle==="helicoptero")||running&&!paused&&e.code==="KeyF"&&state.altitude<2&&Math.abs(state.speed)<12)toggleVehicle();if(running&&!paused&&e.code==="KeyC"){cameraMode=(cameraMode+1)%3;showToast("CÂMERA // "+["DISTANTE","PADRÃO","PRÓXIMA"][cameraMode])}if(running&&!paused&&e.code==="KeyR"&&state.vehicle!=="aviao"&&state.vehicle!=="helicoptero"||running&&!paused&&e.code==="KeyT")toggleRadio()}keys.add(e.code)});addEventListener("keyup",e=>keys.delete(e.code));
-addEventListener("resize",resize);document.addEventListener("visibilitychange",()=>{if(document.hidden&&running){paused=true;pause.classList.add("ativo");saveGame(false)}lastFrame=performance.now()});
-if("serviceWorker" in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("./sw.js").catch(()=>{});
-setInterval(()=>{const d=new Date();$("#menuClock").textContent=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")},1000);setInterval(()=>{if(running&&!paused)saveGame(false)},60000);
-async function init(){try{Object.assign(settings,JSON.parse(localStorage.getItem("neon-settings"))||{})}catch(e){}$("#preset").value=settings.preset;$("#resolution").value=settings.resolution;$$('[data-setting="bloom"]').forEach(x=>x.classList.toggle("on",settings.bloom));$$('[data-setting="reflexos"]').forEach(x=>x.classList.toggle("on",settings.reflexos));$$('[data-volume]').forEach(x=>x.value=Math.round(settings[x.dataset.volume]*100));await openDB();resize();updateGarage(selectedVehicle);radioUpdate();requestAnimationFrame(drawScene);requestAnimationFrame(frame);setTimeout(()=>$("#boot").classList.add("sair"),1300)}
-init();
-})();
-</script>
+<footer class="menu-footer"><div><span><kbd>ENTER</kbd>JOGAR</span><span><kbd>ESC</kbd>VOLTAR</span></div><div><span>RENDER <b>THREE.JS / PBR</b></span><span>BUILD <b>2.0 // FIRST PERSON</b></span></div></footer>
+</main>
+<section id="gameUi">
+<div class="hud-left"><small>DISTRITO ATUAL</small><strong>CENTRO DE NOVA AURORA</strong><i></i></div>
+<div class="hud-center"><div><span id="clock">22:47</span><b>NOITE</b></div><div><span>☂</span><b>CHUVA LEVE</b></div><div><span>OBJ</span><b>EXPLORAÇÃO LIVRE</b></div></div>
+<div class="mode-badge">MODO <b id="modeText">MOTORISTA</b></div><div class="reticle"></div>
+<div class="vehicle-hud" id="vehicleHud"><div class="speed"><span id="speedValue">000</span><small>KM/H</small></div><div class="car-name">AURORA RS // ELÉTRICO</div><div class="rpm"><i id="rpmBar"></i></div><div class="vehicle-meta"><span>POTÊNCIA <b id="powerValue">0%</b></span><span>BATERIA <b>92%</b></span></div></div>
+<div id="radioDash"><div class="radio-help"><b>R</b> ABRIR / FECHAR · INTERAJA COM O MOUSE</div><div class="dash-shell"><div class="dash-top"><span><i class="dash-led"></i>SISTEMA MULTIMÍDIA</span><b>LINK / IFRAME</b></div><div class="player-wrap"><iframe id="radioFrame" title="Player multimídia do veículo" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div><form class="radio-form" id="radioForm"><input id="radioUrl" type="text" spellcheck="false" autocomplete="off" placeholder="Cole um link do YouTube, Vimeo ou player incorporável"><button type="submit">CARREGAR</button><button type="button" class="radio-close" id="radioClose">×</button></form></div></div>
+<div class="prompt" id="prompt"><kbd>F</kbd><span id="promptText">SAIR DO CARRO</span></div><div class="controls" id="controlText">W/S ACELERAR · A/D VIRAR · F SAIR · R MULTIMÍDIA · ESC PAUSA</div><div class="toast" id="toast"></div>
+</section>
+<section id="pause"><div class="pause-card"><div class="overline">Simulação suspensa</div><h2>PAUSA</h2><nav class="pause-nav"><button data-pause="resume">CONTINUAR</button><button data-pause="save">SALVAR POSIÇÃO</button><button data-pause="settings">AJUSTES GRÁFICOS</button><button data-pause="menu">VOLTAR AO MENU PRINCIPAL</button></nav><div class="pause-foot">SALVAMENTO LOCAL ATIVO // NOVA AURORA</div></div></section>
+<div class="overlay" id="settingsOverlay"><section class="panel"><header class="panel-head"><div><small>SISTEMA VISUAL</small><h3>AJUSTES GRÁFICOS</h3></div><button class="close-panel">×</button></header><div class="panel-body"><div class="setting"><label><strong>QUALIDADE</strong><small>Detalhes, sombras e densidade de pixels</small></label><select id="quality"><option value="low">FRIO</option><option value="balanced">EQUILIBRADO</option><option value="high" selected>ALTO</option><option value="ultra">CYBERPUNK</option></select></div><div class="setting"><label><strong>CAMPO DE VISÃO</strong><small>Amplitude da câmera em primeira pessoa</small></label><input id="fov" type="range" min="65" max="95" value="78"></div><div class="setting"><label><strong>VOLUME DO VEÍCULO</strong><small>Motor elétrico e ambiente</small></label><input id="volume" type="range" min="0" max="100" value="45"></div><div class="setting"><label><strong>LIMITE DE QUADROS</strong><small>Proteção térmica obrigatória</small></label><b style="font-size:8px;color:var(--cyan)">60 FPS</b></div></div></section></div>
+<div id="mobileBlock"><div class="mobile-message"><div class="diamond"></div><strong>EXPERIÊNCIA DESKTOP</strong><p>NEON WORLD usa controles em primeira pessoa, mouse e teclado. Abra em uma tela com pelo menos 680 pixels para entrar na cidade.</p></div></div>
+<script src="game.js" defer></script>
 </body>
 </html>
