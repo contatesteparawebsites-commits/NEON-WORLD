@@ -1,76 +1,97 @@
 # NEON WORLD
 
-Protótipo jogável offline de uma experiência urbana em mundo aberto, com interface integralmente em português do Brasil.
+Experiência urbana 3D em primeira pessoa para navegador, inteiramente em português do Brasil. O jogador dirige pela cidade de Nova Aurora a partir do cockpit, pode abandonar o veículo e explorar as ruas a pé, além de usar um player multimídia interativo integrado ao painel do carro.
 
 ## Executar
 
-O jogo não tem dependências, etapa de compilação ou servidor de aplicação.
-
-### Abrir diretamente
-
-Abra `index.html` em Chrome, Edge ou Firefox. O jogo funciona sem conexão e salva o progresso localmente.
-
-### Servir localmente
-
-Para ativar também o cache do Service Worker:
+O build final está incluído no repositório. Inicie um servidor local:
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Acesse `http://localhost:8080` e carregue a página uma vez. Depois desse primeiro acesso, os arquivos essenciais ficam disponíveis no cache offline.
+Abra `http://localhost:8080` em Chrome, Edge ou Firefox.
 
-## Recursos do protótipo
+O Service Worker salva `index.html` e `game.js` no cache após o primeiro carregamento. A partir daí, a cidade e todos os recursos procedurais continuam disponíveis offline. Conteúdo carregado no player do carro ainda depende da fonte externa escolhida.
 
-- Cidade noturna procedural com ruas, edifícios, parques, tráfego e chuva
-- Seis destinos com identidade visual própria
-- Modos visual Realista, Híbrido e Estilizado
-- Exploração a pé e entrada ou saída do veículo
-- Cinco classes dirigíveis: carro, motocicleta, ônibus, avião e helicóptero
-- Física, velocidade e dirigibilidade próprias para cada classe
-- Altitude para aeronaves e controle coletivo
-- Três distâncias de câmera
-- HUD com minimapa, relógio, clima, combustível, integridade e velocímetro
-- Garagem para escolher o veículo ativo
-- Rádio offline sintetizada com cinco estações
-- Atalho para abrir Poketube.fun em uma janela externa
-- Presets Frio, Equilibrado, Alto, Cyberpunk e Estilizado
-- Resolução dinâmica e limite de atualização de 60 FPS
+## Desenvolvimento
+
+```bash
+npm install
+npm run build
+npm run dev
+```
+
+O código-fonte está em `src/app.js`. O comando de build empacota Three.js e a aplicação em `game.js`, sem dependências externas em tempo de execução.
+
+## Experiência
+
+- Cidade 3D única chamada Nova Aurora
+- Direção integralmente em primeira pessoa
+- Cockpit modelado com volante, painel, capô e para-brisa
+- Entrada e saída do veículo a qualquer momento quando ele estiver parado
+- Exploração a pé com câmera livre, corrida, salto e colisões
+- Centenas de edifícios procedurais com fachadas iluminadas
+- Avenidas, cruzamentos, calçadas, parques, árvores e sinalização
+- Tráfego urbano independente
+- Chuva dinâmica e pavimento molhado
+- Iluminação física, reflexos, sombras suaves, neblina e tone mapping ACES
+- Bloom seletivo em letreiros, faróis e iluminação urbana
+- Menu cinematográfico renderizado sobre a cidade real
+- Presets Frio, Equilibrado, Alto e Cyberpunk
+- Resolução dinâmica e limite de 60 FPS
+- Salvamento local da posição, ajustes e endereço do player
 - Pausa automática quando a aba fica oculta
-- Salvamento automático a cada 60 segundos em IndexedDB, com fallback em localStorage
-- Layout responsivo para telas menores
-- Código e interface sem dependências ou recursos gráficos externos
+- Interface responsiva para computadores e notebooks
 
 ## Controles
 
-| Ação | Tecla |
+| Ação | Controle |
 |---|---|
+| Olhar | Mouse |
 | Acelerar / andar | `W` ou `↑` |
 | Frear / ré | `S` ou `↓` |
-| Virar / mover | `A` `D` ou `←` `→` |
-| Correr / nitro | `Shift` |
-| Entrar ou sair do veículo | `F` |
-| Alternar câmera | `C` |
-| Ligar ou desligar rádio | `R` |
-| Rádio durante o voo | `T` |
+| Virar / mover lateralmente | `A` `D` ou `←` `→` |
+| Nitro / correr | `Shift` |
+| Sair ou entrar no carro | `F` |
+| Abrir multimídia do carro | `R` |
+| Saltar a pé | `Espaço` |
 | Pausar | `Esc` |
-| Subir aeronave | `R` |
-| Descer aeronave | `F` |
 
-No avião e no helicóptero, `R` e `F` controlam altitude. Durante o voo, use `T` para o rádio. No solo e com a aeronave parada, `F` alterna o modo a pé.
+Clique na imagem do jogo para capturar novamente o mouse depois de fechar um menu.
 
-## Rádio
+## Multimídia do carro
 
-As estações internas usam Web Audio e são sintetizadas localmente, portanto continuam disponíveis offline e não reproduzem conteúdo protegido de terceiros.
+1. Entre no veículo.
+2. Pressione `R` para abrir o painel interativo.
+3. Cole um link completo ou um código de `iframe` no campo inferior.
+4. Pressione **CARREGAR**.
+5. Use o mouse diretamente sobre o player para iniciar, pausar ou alterar o volume.
+6. Pressione `R`, `Esc` ou o botão `×` para voltar à direção.
 
-O botão **ABRIR POKETUBE.FUN** abre o serviço em uma janela separada após uma ação explícita do usuário. Essa fonte requer internet e não é embutida nem ocultada pelo jogo. O navegador pode bloquear a janela caso pop-ups estejam desativados.
+Links comuns do YouTube, YouTube Music, `youtu.be` e Vimeo são convertidos automaticamente para seus players incorporáveis. Endereços que já apontam para um player `embed` também são aceitos.
+
+Alguns sites enviam `X-Frame-Options` ou uma política CSP que proíbe incorporação. Essa decisão pertence ao site de origem e não pode ser contornada pelo jogo. O navegador também exige uma ação do usuário para iniciar áudio ou vídeo.
 
 ## Salvamento
 
-O progresso inclui posição, veículo, combustível, altitude, horário, cidade, modo do mapa, estação e estado do rádio. Use **SALVAR JOGO** no menu de pausa para salvar manualmente. A aplicação também salva ao pausar, voltar ao menu e a cada 60 segundos.
+O progresso é salvo em `localStorage` a cada 60 segundos, ao pausar e ao voltar para o menu. São preservados:
 
-Para apagar o progresso, remova os dados do site nas configurações do navegador.
+- Posição e orientação do veículo
+- Link utilizado no painel multimídia
+- Qualidade gráfica
+- Campo de visão
+- Volume do veículo
 
-## Escopo
+O botão **CONTINUAR** aparece disponível quando existe um salvamento local.
 
-Esta entrega é um vertical slice executável e sem recursos externos. A cidade é procedural; streaming de satélite, elevação real, interiores, modelos 3D de alta fidelidade e ray tracing por hardware pertencem às fases posteriores descritas na especificação do produto. O preset Cyberpunk ativa a identidade visual máxima do protótipo, sem afirmar suporte a ray tracing real.
+## Tecnologia
+
+- Three.js 0.170
+- WebGL2 com fallback WebGL
+- Materiais PBR e `MeshPhysicalMaterial`
+- EffectComposer e Unreal Bloom
+- Geometria, texturas, fachadas e letreiros gerados em tempo de execução
+- Web Audio para o motor elétrico
+- Service Worker para cache offline
+- HTML, CSS e JavaScript sem assets gráficos externos
